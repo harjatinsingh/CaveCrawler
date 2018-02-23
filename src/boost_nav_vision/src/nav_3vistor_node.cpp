@@ -100,7 +100,7 @@ void cloud_cb (const sensor_msgs::PointCloud2ConstPtr& cloud_msg)
   // Read in the cloud data
   ROS_DEBUG_STREAM("PointCloud has: " << cloud->points.size () << " data points.");
 
-  // Build a passthrough filter
+  // Build a passthrough filter for when required
   pass.setInputCloud (cloud);
   pass.setFilterFieldName ("z");
   pass.setFilterLimits (-50.0, 50.0);
@@ -108,15 +108,13 @@ void cloud_cb (const sensor_msgs::PointCloud2ConstPtr& cloud_msg)
   ROS_DEBUG_STREAM("PointCloud after Z filtering has: " << cloud_filtered->points.size () << " data points.");
 
 
-  // Build a passthrough filter
+  // Build a passthrough filter for when required
   pass.setInputCloud (cloud_filtered);
   pass.setFilterFieldName ("y");
   pass.setFilterLimits (-50.0, 50.0);
   pass.filter (*cloud_filtered);
   ROS_DEBUG_STREAM("PointCloud after Y filtering has: " << cloud_filtered->points.size () << " data points.");
   
-
-
 
   // Build a passthrough filter
   pass.setInputCloud (cloud_filtered);

@@ -16,7 +16,10 @@ class JoyArduino
 
 JoyArduino::JoyArduino()
 {
+	//publish bot commands
 	ArduinoPub = nh.advertise<std_msgs::Int32MultiArray>("bot",100);
+	
+	//joystick topic
 	JoySub = nh.subscribe<sensor_msgs::Joy>("joy",10,&JoyArduino::joyCallback,this);
 
 }
@@ -39,37 +42,42 @@ void JoyArduino::joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
 
 	//map joystick axes to robot controls 
 
+	//linear velocity mapping
 	PublishArray.data.push_back(ConvertToRange(joy->axes[4]));
+	
+	//steering mapping
 	PublishArray.data.push_back(ConvertToRange(-1*joy->axes[3]));
+	
+	//max robot speed
 	PublishArray.data.push_back(absoluteRange(joy->axes[2]));
 
 
 	//map joystick buttons to robot control
 	if(joy->buttons[5] == 1)
 	{
-		PublishArray.data.push_back(1);	
+		PublishArray.data.push_back(1); //forward mode	
 	}
 	else if (joy->buttons[4] == 1)
 	{
-		PublishArray.data.push_back(2);
+		PublishArray.data.push_back(2); //crab mode
 	}
 	else
 	{
-		PublishArray.data.push_back(0);
+		PublishArray.data.push_back(0);//continue in previous mode
 	}
 
 	if(joy->buttons[8] == 1)	
 	{
-		PublishArray.data.push_back(1);	
+		PublishArray.data.push_back(1);	 //forward direction
 	}
 	else
 	{
-		PublishArray.data.push_back(0);
+		PublishArray.data.push_back(0);//reverse direction
 	}
 
 	if(joy->buttons[6] == 1 && joy->buttons[7] == 1 && joy->buttons[9] == 1 &&joy->buttons[10] == 1)	
 	{
-		PublishArray.data.push_back(1);	
+		PublishArray.data.push_back(1);	//amplifiers reset
 	}
 	else
 	{
