@@ -27,7 +27,7 @@
 
 #include <pcl/filters/statistical_outlier_removal.h>
 
-#include <boost_nav_vision/Heading.h>
+// #include <boost_nav_vision/Heading.h>
 
 #include <std_msgs/Int32MultiArray.h>
 
@@ -41,7 +41,7 @@ ros::Publisher heading_pub;
 ros::Publisher ArduinoPub ;
 geometry_msgs::Twist twist_msg;
 
-boost_nav_vision::Heading headingMsg;
+// boost_nav_vision::Heading headingMsg;
 
 typedef pcl::PointXYZ PointT;
 
@@ -73,23 +73,23 @@ void cloud_cb (const sensor_msgs::PointCloud2ConstPtr& cloud_msg)
   // Convert the sensor_msgs/PointCloud2 data to pcl/PointCloud
   pcl::PointCloud<PointT>::Ptr cloud (new pcl::PointCloud<PointT>);
   pcl::fromROSMsg (*cloud_msg, *cloud);
-  // pcl::PointCloud<pcl::PointXYZ> output_cloud;  // Used to output inliers  
+  // pcl::PointCloud<pcl::PointXYZ> output_cloud;  // Used to output inliers
 
   // All the objects needed
   pcl::PassThrough<PointT> pass;
   pcl::StatisticalOutlierRemoval<pcl::PointXYZ> sor;
-  
+
   pcl::NormalEstimation<PointT, pcl::Normal> ne;
-  pcl::SACSegmentationFromNormals<PointT, pcl::Normal> seg , seg_row1, seg_row2; 
-  
+  pcl::SACSegmentationFromNormals<PointT, pcl::Normal> seg , seg_row1, seg_row2;
+
   pcl::ExtractIndices<PointT> extract, extract_row1, extract_row2;
   pcl::ExtractIndices<pcl::Normal> extract_normals, extract_normals_row1, extract_normals_row2;
-  
+
   pcl::search::KdTree<PointT>::Ptr tree (new pcl::search::KdTree<PointT> ());
 
   // // Datasets
   pcl::PointCloud<PointT>::Ptr cloud_filtered (new pcl::PointCloud<PointT>), ground_filtered (new pcl::PointCloud<PointT>), row_filtered1 (new pcl::PointCloud<PointT>), row_filtered2 (new pcl::PointCloud<PointT>), rows_filtered (new pcl::PointCloud<PointT>);
-  
+
   pcl::PointCloud<pcl::Normal>::Ptr temp_normals (new pcl::PointCloud<pcl::Normal>), normals_row1 (new pcl::PointCloud<pcl::Normal>), normals_row2 (new pcl::PointCloud<pcl::Normal>);
 
   pcl::ModelCoefficients::Ptr coefficients_ground_plane (new pcl::ModelCoefficients), coefficients_row1_plane (new pcl::ModelCoefficients), coefficients_row2_plane (new pcl::ModelCoefficients);
@@ -114,7 +114,7 @@ void cloud_cb (const sensor_msgs::PointCloud2ConstPtr& cloud_msg)
   pass.setFilterLimits (-50.0, 50.0);
   pass.filter (*cloud_filtered);
   ROS_DEBUG_STREAM("PointCloud after Y filtering has: " << cloud_filtered->points.size () << " data points.");
-  
+
 
   // Build a passthrough filter
   pass.setInputCloud (cloud_filtered);
@@ -138,7 +138,7 @@ void cloud_cb (const sensor_msgs::PointCloud2ConstPtr& cloud_msg)
   // Build statistical outlier removal filter
   sor.setInputCloud (cloud_filtered);
   sor.setMeanK (20);  // number of neighbors to calculate
-  sor.setStddevMulThresh (1.0);  // standard deviation multiplier outside which a point is  considered an outlier 
+  sor.setStddevMulThresh (1.0);  // standard deviation multiplier outside which a point is  considered an outlier
   sor.filter (*cloud_filtered);
 
 
@@ -297,13 +297,13 @@ void cloud_cb (const sensor_msgs::PointCloud2ConstPtr& cloud_msg)
   headingE = headingE - 0.1; // Adjusting for incorrect alignment of sensor, HACK!
 
   // Publish heading error
-  headingMsg.crosstrackError = deltaD;
-  headingMsg.headingError = headingE;  
-  heading_pub.publish(headingMsg);
+  // headingMsg.crosstrackError = deltaD;
+  // headingMsg.headingError = headingE;
+  // heading_pub.publish(headingMsg);
 
   // float normRow1 = sqrtf(
-  //                 powf(coefficients_row1_plane->values[0], 2) + 
-  //                 powf(coefficients_row1_plane->values[1], 2) + 
+  //                 powf(coefficients_row1_plane->values[0], 2) +
+  //                 powf(coefficients_row1_plane->values[1], 2) +
   //                 powf(coefficients_row1_plane->values[2], 2));
   // ROS_INFO_STREAM("Norm of left row: " << normRow1);
 
@@ -337,7 +337,7 @@ void cloud_cb (const sensor_msgs::PointCloud2ConstPtr& cloud_msg)
   arrow.points.push_back(p);
   p.x = 1; p.y = deltaD*0.5; p.z = 0.0;
   //p.y = deltaD*50; p.x = 0; p.z = 1.0;
-  arrow.points.push_back(p);  
+  arrow.points.push_back(p);
   marker_pub.publish(arrow);
 
 
@@ -366,7 +366,7 @@ void cloud_cb (const sensor_msgs::PointCloud2ConstPtr& cloud_msg)
   // extract.setNegative (false);
   // pcl::PointCloud<PointT>::Ptr cloud_cylinder (new pcl::PointCloud<PointT> ());
   // extract.filter (*cloud_cylinder);
-  // if (cloud_cylinder->points.empty ()) 
+  // if (cloud_cylinder->points.empty ())
   //   std::cerr << "Can't find the cylindrical component." << std::endl;
   // else
   // {
@@ -376,7 +376,7 @@ void cloud_cb (const sensor_msgs::PointCloud2ConstPtr& cloud_msg)
 
 
   // Convert to ROS data type
-  // sensor_msgs::PointCloud2 output; 
+  // sensor_msgs::PointCloud2 output;
   // pcl_conversions::moveFromPCL(*cloud_filtered, output);
 
   // Print important information
@@ -418,7 +418,7 @@ void cloud_cb (const sensor_msgs::PointCloud2ConstPtr& cloud_msg)
   pcl::fromPCLPointCloud2(pcl_pc2, *temp_cloud);
 
   // Container for original & filtered data
-  pcl::PCLPointCloud2* cloud = new pcl::PCLPointCloud2; 
+  pcl::PCLPointCloud2* cloud = new pcl::PCLPointCloud2;
   pcl::PCLPointCloud2ConstPtr cloudPtr(cloud);
   // pcl::PCLPointCloud2 cloud_filtered;
 
@@ -433,18 +433,18 @@ void cloud_cb (const sensor_msgs::PointCloud2ConstPtr& cloud_msg)
 
 
   // Convert to ROS data type
-  sensor_msgs::PointCloud2 output; 
+  sensor_msgs::PointCloud2 output;
   pcl_conversions::moveFromPCL(cloud_filtered, output);
 
   // Publish the data
   pub.publish (output);
 
   // Print info about the clouds to the screen
-  ROS_INFO_STREAM("Input cloud: " << cloud->width * cloud->height 
+  ROS_INFO_STREAM("Input cloud: " << cloud->width * cloud->height
        << " data points with (" << pcl::getFieldsList (*cloud) << ") attributes.");
 
-  ROS_INFO_STREAM("Output cloud: " << cloud_filtered.width * cloud_filtered.height   
-       << " data points with (" << pcl::getFieldsList (cloud_filtered) << ") attributes."); 
+  ROS_INFO_STREAM("Output cloud: " << cloud_filtered.width * cloud_filtered.height
+       << " data points with (" << pcl::getFieldsList (cloud_filtered) << ") attributes.");
 */
 
 
@@ -469,7 +469,7 @@ int main (int argc, char** argv)
   // Create a ROS publisher for the output point cloud
   marker_pub = nh.advertise<visualization_msgs::Marker>("/visualization_marker", 10);
   twist_pub = nh.advertise<geometry_msgs::Twist> ("/sickToF/nav_vel", 1);
-  heading_pub = nh.advertise<boost_nav_vision::Heading> ("/headingError", 1);
+  // heading_pub = nh.advertise<boost_nav_vision::Heading> ("/headingError", 1);
 
   pub1 = nh.advertise<pcl::PointCloud<pcl::PointXYZ> > ("/sickToF/groundPlane", 1);
   pub2 = nh.advertise<pcl::PointCloud<pcl::PointXYZ> > ("/sickToF/rightRowPlane", 1);
@@ -479,11 +479,9 @@ int main (int argc, char** argv)
   // Create a ROS subscriber for the input point cloud
   ros::Subscriber sub = nh.subscribe ("/velodyne_points", 1, cloud_cb);
 
-
   ros::Rate r(10);
   while (ros::ok())
   {
-
     r.sleep();
 
     // Spin
