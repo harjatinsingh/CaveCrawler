@@ -1,0 +1,11 @@
+<launch>
+  <node name="nmea_gps_driver" pkg="nmea_gps_driver_mod" type="nmea_gps_driver_mod.py" respawn="true" >
+    <param name="useEthernet"        type="bool" value="false" />
+    <param name="gps_usb_addr"        type="string" value="/dev/garmin_gps" />
+    <param name="gps_usb_type"        type="string" value="garmin" />
+    <param name="topic_id"           type="string" value="gps" />
+    <param name="useRMC"              type="bool" value="false" />
+
+  </node>
+</launch>
+
