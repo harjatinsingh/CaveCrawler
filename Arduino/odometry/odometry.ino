@@ -5,31 +5,27 @@
 
 #include <ros.h>
 #include <ros/time.h>
-#include <tf/tf.h>
-#include <tf/transform_broadcaster.h>
+#include <std_msgs/Int16MultiArray.h>
+#include <std_msgs/MultiArrayLayout.h>
+#include <std_msgs/MultiArrayDimension.h>
+#include <Encoder.h>
 
 ros::NodeHandle nh;
 
-geometry_msgs::TransformStamped t;
-tf::TransformBroadcaster broadcaster;
-
-double x = 1.0;
-double y = 0.0;
-double theta = 1.57;
-
-double left_odom = 0;
-double left_turn = 0;
-double right_odom = 0;
-double right_turn = 0; 
-
-char base_link[] = "/base_link";
-char odom[] = "/odom";
-
+static int messageLength = 4;
+std_msgs::Int16MultiArray odometry;
+ros::Publisher odometry_pub( "odometry", &odometry);
 long int lastPubTime = 0;
 int dataRate  = 100; // ms or 10Hz
 
-#include <Encoder.h>
-Encoder myEnc(9, 10);
+
+Encoder left_enc(9, 10);
+Encoder right_enc(5, 6);
+
+int left_odom = 0;
+int left_turn = 0;
+int right_odom = 0;
+int right_turn = 0; 
 
 bool debug = false; // Switch Serial Print / ROS Publisher
 
@@ -39,8 +35,21 @@ void setup() {
   }
   else {
     nh.initNode();
-    broadcaster.init(nh);
+    setupMsg(odometry, odometry_pub);
   }
+}
+
+void setupMsg(std_msgs::Int16MultiArray &msg, ros::Publisher &pub) {
+  msg.layout.dim =
+    (std_msgs::MultiArrayDimension *)
+    malloc(sizeof(std_msgs::MultiArrayDimension) * 2);
+  msg.layout.dim[0].label = "height";
+  msg.layout.dim[0].size = messageLength;
+  msg.layout.dim[0].stride = 1;
+  msg.layout.data_offset = 0;
+  msg.data = (int16_t *)malloc(sizeof(int) * 8);
+  msg.data_length = messageLength;
+  nh.advertise(pub);
 }
 
 void loop() {
@@ -59,46 +68,31 @@ void loop() {
       Serial.println("");
   }
   else { // ROS Publisher
+  
+    sendMsg(odometry, odometry_pub);
+    nh.spinOnce();
 
-    long int time = millis();
-    double dt = (time - lastPubTime);
-    if (dt > dataRate) { // attenuate rate
-  
-      // drive in a circle
-      double dx = 0.2;
-      double dtheta = 0.18;
-      x += cos(theta)*dx*0.1;
-      y += sin(theta)*dx*0.1;
-      theta += dtheta*0.1;
-      if(theta > 3.14)
-        theta=-3.14;
-        
-      // tf odom->base_link
-      t.header.frame_id = odom;
-      t.child_frame_id = base_link;
-      
-      t.transform.translation.x = x;
-      t.transform.translation.y = y;
-      
-      t.transform.rotation = tf::createQuaternionFromYaw(theta);
-      t.header.stamp = nh.now();
-      
-      broadcaster.sendTransform(t);
-      nh.spinOnce();
-  
-    }
   }
 }
 
-void readSensor() {
+void read_sensors() {
 
-  left_odom = left_odom + 1;
+  left_odom = left_enc.read();
+  right_odom = right_enc.read();
+
+  // TODO
   left_turn = left_turn + 1;
-  right_odom = right_odom + 1;
   right_turn = right_turn + 1;
   
 }
 
+void sendMsg(std_msgs::Int16MultiArray &msg, ros::Publisher &pub) {
+  msg.data[0] = left_odom;
+  msg.data[1] = right_odom;
+  msg.data[2] = left_turn;
+  msg.data[3] = right_turn;
+  pub.publish(&msg);
+}
 
 
 
