@@ -2,8 +2,8 @@ To upload this code from any computer to the arduino, the following libraries mu
 
 1) Rosserial must be installed
 	
-_sudo apt-get install ros-<distro>-rosserial-arduino <br />
-sudo apt-get install ros-<distro>-rosserial_ <br />
+_sudo apt-get install ros-[distro]-rosserial-arduino <br />
+sudo apt-get install ros-[distro]-rosserial_ <br />
 
 2) Rosserial must be setup for the arduino IDE
 
