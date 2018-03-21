@@ -1,2 +1,0 @@
-float64 crosstrackError
-float64 headingError
