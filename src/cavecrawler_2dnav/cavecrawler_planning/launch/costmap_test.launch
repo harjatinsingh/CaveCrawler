@@ -3,6 +3,9 @@
     	<rosparam file="$(find cavecrawler_planning)/params/costmap_params/local_costmap_params.yaml" command="load" />
     	<rosparam file="$(find cavecrawler_planning)/params/costmap_params/global_costmap_params.yaml" command="load" />
     	<rosparam file="$(find cavecrawler_planning)/params/costmap_common_params.yaml" command="load" ns="global_costmap" />
+
+
+
     	<rosparam file="$(find cavecrawler_planning)/params/costmap_common_params.yaml" command="load" ns="local_costmap" />
     </node>
 
