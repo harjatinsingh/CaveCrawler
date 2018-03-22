@@ -1,0 +1,10 @@
+link - http://ompl.kavrakilab.org/installation.html
+
+In the script file, make the changes:
+line 25 g++-5 to g++-4.8 or which ever version in your laptop
+
+./install-ompl-ubuntu.sh in the same directory as the install script.
+
+DO NOT INSTALL WITH PYTHON BINDINGS 
+
+
