@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no" ?>
 <launch>
-	<include file="$(find localization)/launch/sub_launch/ekf.launch"/>
+	<include file="$(find localization)/launch/sub_launch/ekf_scorpion.launch"/>
 	<include file="$(find localization)/launch/sub_launch/navsat_transform.launch"/>
 	<include file="$(find localization)/launch/sub_launch/hector_trajectory.launch"/>
 
