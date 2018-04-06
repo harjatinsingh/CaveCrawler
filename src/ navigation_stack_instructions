@@ -1,0 +1,19 @@
+1. sudo apt-get install ros-kinetic-joy
+2. git clone https://github.com/ros-planning/navigation.git
+3. sudo apt-get install ros-kinetic-geographic-msgs
+4. sudo apt-get install ros-kinetic-map-server
+5. sudo apt-get install ros-kinetic-geodesy
+6. rosdep install --from-paths src --ignore-src --rosdistro kinetic -y (RUN THIS WHENEVER U FACE ISSUE)
+7. sudo apt-get install ros-kinetic-move-base
+8. OMPL install instructions
+
+link - http://ompl.kavrakilab.org/installation.html
+
+sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu `lsb_release -sc` main" > /etc/apt/sources.list.d/ros-latest.list'
+wget http://packages.ros.org/ros.key -O - | sudo apt-key add -
+
+sudo apt-get update
+sudo apt-get install ros-indigo-ompl
+
+
+
