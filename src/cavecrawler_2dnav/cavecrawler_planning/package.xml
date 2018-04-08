@@ -4,13 +4,9 @@
   <version>0.0.0</version>
   <description>Autonomous Navigation using ROS Navigation Stack</description>
 
-  <maintainer email="njk@todo.todo">njk</maintainer>
+  <maintainer email="mswenson@andrew.cmu.edu">mts</maintainer>
 
   <license>TODO</license>
-
-  <url type="website">https://github.com/njkaiser/nu_jackal_autonav</url>
-
-  <author email="njk@todo.todo">Nate Kaiser</author>
 
   <buildtool_depend>catkin</buildtool_depend>
     roscpp
