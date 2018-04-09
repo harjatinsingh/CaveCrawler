@@ -1,6 +1,6 @@
 global_costmap:
    global_frame: world
-   robot_base_frame: vehicle
+   robot_base_frame: base_link #vehicle
   #  update_frequency: 20.0
    update_frequency: 5.0
    publish_frequency: 5.0
