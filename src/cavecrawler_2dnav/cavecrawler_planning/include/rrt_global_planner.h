@@ -2,22 +2,33 @@
 /** for global path planner interface */
 #include <ros/ros.h>
 #include <costmap_2d/costmap_2d_ros.h>
-#include <costmap_2d/costmap_2d.h>
-#include <nav_core/base_global_planner.h>
-#include <geometry_msgs/PoseStamped.h>
 #include <angles/angles.h>
 #include <base_local_planner/world_model.h>
 #include <base_local_planner/costmap_model.h>
-#include <ompl/base/spaces/RealVectorStateSpace.h>
-#include <ompl/base/spaces/SE2StateSpace.h>
-// #include <ompl/base/spaces/SE3StateSpace.h>
+#include <costmap_2d/costmap_2d.h>
+#include <geometry_msgs/PoseStamped.h>
+#include <geometry_msgs/Point.h>
+#include <nav_msgs/Path.h>
+#include <tf/transform_datatypes.h>
+#include <nav_core/base_global_planner.h>
+#include <nav_msgs/GetPlan.h>
+#include <base_local_planner/costmap_model.h>
 
+#include <ompl/base/spaces/RealVectorStateSpace.h>
+// #include <ompl/base/spaces/SE3StateSpace.h>
 #include <ompl/base/SpaceInformation.h>
 #include <ompl/base/ScopedState.h>
 #include <ompl/base/objectives/PathLengthOptimizationObjective.h>
-#include <ompl/geometric/planners/bitstar/BITstar.h>
 #include <ompl/geometric/planners/rrt/RRTstar.h>
 #include <ompl/geometric/planners/rrt/RRTConnect.h>
+#include <ompl/base/spaces/SE2StateSpace.h>
+#include <ompl/control/planners/rrt/RRT.h>
+#include <ompl/geometric/planners/rrt/RRTstar.h>
+#include <ompl/geometric/planners/rrt/RRTConnect.h>
+#include <ompl/control/spaces/RealVectorControlSpace.h>
+#include <ompl/control/SimpleSetup.h>
+#include <ompl/base/objectives/StateCostIntegralObjective.h>
+#include <ompl/base/objectives/MechanicalWorkOptimizationObjective.h>
 
 #ifndef RRT_GLOBAL_PLANNER_CPP
 #define RRT_GLOBAL_PLANNER_CPP
@@ -29,6 +40,7 @@ using std::string;
 
 namespace ob = ompl::base;
 namespace og = ompl::geometric;
+namespace oc = ompl::control;
 
 namespace ompl_global_planner {
 
@@ -42,7 +54,7 @@ class OmplGlobalPlanner : public nav_core::BaseGlobalPlanner
 
 	/** overridden classes from interface nav_core::BaseGlobalPlanner **/
 	void initialize(std::string name, costmap_2d::Costmap2DROS* costmap_ros);
-	bool isStateValid(const ob::State *state);
+	bool isStateValid(const oc::SpaceInformation *si,const ob::State *state);
 	bool makePlan(const geometry_msgs::PoseStamped& start,
 	            const geometry_msgs::PoseStamped& goal,
 	            std::vector<geometry_msgs::PoseStamped>& plan
@@ -56,7 +68,7 @@ class OmplGlobalPlanner : public nav_core::BaseGlobalPlanner
     ros::Publisher _plan_pub;
     bool _initialized;
     bool _allow_unknown;
-
+    float  max_footprint_cost;
     std::string tf_prefix_;
     // boost::mutex _mutex;
     base_local_planner::CostmapModel* _costmap_model;

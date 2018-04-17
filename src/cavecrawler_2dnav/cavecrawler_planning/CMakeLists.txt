@@ -44,6 +44,6 @@ include
 
 #add_executable( rrt_global_planner src/rrt_global_planner.cpp)
 add_library(rrt_global_planner_lib src/rrt_global_planner.cpp)
-target_link_libraries(rrt_global_planner_lib ${catkin_LIBRARIES} ${OMPL_LIBRARIES})
+target_link_libraries(rrt_global_planner_lib ${catkin_LIBRARIES} ${OMPL_LIBRARIES} base_local_planner )
 
 
