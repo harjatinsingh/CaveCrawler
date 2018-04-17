@@ -3,27 +3,27 @@
 
 // #include "shapes/shapes.h"
 
-PLUGINLIB_EXPORT_CLASS(global_planner::GlobalPlanner, nav_core::BaseGlobalPlanner)
+PLUGINLIB_EXPORT_CLASS(ompl_global_planner::OmplGlobalPlanner, nav_core::BaseGlobalPlanner)
 //PLUGINLIB_EXPORT_CLASS(rrt_global_planner::OMPLPlannerRRT, nav_core::BaseGlobalPlanner)
 
 using namespace std;
 
 // using namespace ca;
-namespace global_planner {
+namespace ompl_global_planner {
 
-GlobalPlanner::GlobalPlanner () : _costmap_ros(NULL), _initialized(false), _allow_unknown(true),_space(new ob::SE2StateSpace),_costmap_model(NULL)
+OmplGlobalPlanner::OmplGlobalPlanner () : _costmap_ros(NULL), _initialized(false), _allow_unknown(true),_space(new ob::SE2StateSpace),_costmap_model(NULL)
 {
 	ROS_INFO_STREAM("constructor 1");
 }
 
-GlobalPlanner::GlobalPlanner(std::string name, costmap_2d::Costmap2DROS* costmap_ros)
+OmplGlobalPlanner::OmplGlobalPlanner(std::string name, costmap_2d::Costmap2DROS* costmap_ros)
 {
 	ROS_INFO_STREAM("constructor 2");
  initialize(name, costmap_ros);
 }
 
 
-void GlobalPlanner::initialize(std::string name, costmap_2d::Costmap2DROS* costmap_ros)
+void OmplGlobalPlanner::initialize(std::string name, costmap_2d::Costmap2DROS* costmap_ros)
 {
    if(!_initialized)
    {
@@ -48,14 +48,14 @@ void GlobalPlanner::initialize(std::string name, costmap_2d::Costmap2DROS* costm
     }
 }
 
-bool GlobalPlanner::isStateValid(const ob::State *state)
+bool OmplGlobalPlanner::isStateValid(const ob::State *state)
 {
     ROS_INFO_STREAM("wtf man");
     return false;
 }
 
 
-bool GlobalPlanner::makePlan(const geometry_msgs::PoseStamped& start, const geometry_msgs::PoseStamped& goal,  std::vector<geometry_msgs::PoseStamped>& plan )
+bool OmplGlobalPlanner::makePlan(const geometry_msgs::PoseStamped& start, const geometry_msgs::PoseStamped& goal,  std::vector<geometry_msgs::PoseStamped>& plan )
 {
   plan.clear();
   ros::NodeHandle n();
@@ -88,7 +88,7 @@ bool GlobalPlanner::makePlan(const geometry_msgs::PoseStamped& start, const geom
   robot_goal->setY(1.0);
   robot_start->setYaw(0.0);
 
- si->setStateValidityChecker(boost::bind(&GlobalPlanner::isStateValid,this,_1));
+ si->setStateValidityChecker(boost::bind(&OmplGlobalPlanner::isStateValid,this,_1));
   //si->setStateValidityChecker([&si](const ob::State *state) { return isStateValid(si.get(), state); });
   si->setStateValidityCheckingResolution(0.001); // dimensionless number as a fraction of the workspace size
   si->setup();

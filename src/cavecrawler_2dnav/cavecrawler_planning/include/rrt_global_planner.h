@@ -30,15 +30,15 @@ using std::string;
 namespace ob = ompl::base;
 namespace og = ompl::geometric;
 
-namespace global_planner {
+namespace ompl_global_planner {
 
-class GlobalPlanner : public nav_core::BaseGlobalPlanner 
+class OmplGlobalPlanner : public nav_core::BaseGlobalPlanner 
 {
 
 	public:
 
-	GlobalPlanner();
-	GlobalPlanner(std::string name, costmap_2d::Costmap2DROS* costmap_ros);
+	OmplGlobalPlanner();
+	OmplGlobalPlanner(std::string name, costmap_2d::Costmap2DROS* costmap_ros);
 
 	/** overridden classes from interface nav_core::BaseGlobalPlanner **/
 	void initialize(std::string name, costmap_2d::Costmap2DROS* costmap_ros);

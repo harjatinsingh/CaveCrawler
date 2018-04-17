@@ -1,5 +1,5 @@
 <library path="lib/librrt_global_planner_lib">
-  <class name="global_planner/GlobalPlanner" type="global_planner::GlobalPlanner" base_class_type="nav_core::BaseGlobalPlanner">
+  <class name="ompl_global_planner/OmplGlobalPlanner" type="ompl_global_planner::OmplGlobalPlanner" base_class_type="nav_core::BaseGlobalPlanner">
     <description>
       RRT global planner
     </description>
