@@ -63,8 +63,8 @@ class OmplGlobalPlanner : public nav_core::BaseGlobalPlanner
 	            const geometry_msgs::PoseStamped& goal,
 	            std::vector<geometry_msgs::PoseStamped>& plan
 	           );
-	
-
+	void get_xy_theta(const ob::State *state, double& x, double& y, double& theta);
+    void publishPlan(const std::vector<geometry_msgs::PoseStamped>& path);
     private:
 
     std::string _frame_id;
@@ -73,6 +73,7 @@ class OmplGlobalPlanner : public nav_core::BaseGlobalPlanner
     bool _allow_unknown;
     float  max_footprint_cost;
     std::string tf_prefix_;
+
     // boost::mutex _mutex;
     
     costmap_2d::Costmap2DROS* _costmap_ros;

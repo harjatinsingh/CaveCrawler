@@ -46,7 +46,7 @@ void OmplGlobalPlanner::initialize(std::string name, costmap_2d::Costmap2DROS* c
         //get the tf prefix
         ros::NodeHandle prefix_nh;
         tf_prefix_ = tf::getPrefixParam(prefix_nh);
-
+        _plan_pub = private_nh.advertise<nav_msgs::Path>("plan", 1);
         _initialized = true;
         ROS_INFO_STREAM("Ompl global planner initialized!");
     }
@@ -100,6 +100,14 @@ bool OmplGlobalPlanner::isStateValid(const ob::State *state)
 		
 		return;
 	}
+
+void OmplGlobalPlanner::get_xy_theta(const ob::State *state, double& x, double& y, double& theta)
+{
+    // Get the values:
+    x = state->as<ob::SE2StateSpace::StateType>()->getX();
+    y = state->as<ob::SE2StateSpace::StateType>()->getY();
+    theta = state->as<ob::SE2StateSpace::StateType>()->getYaw();
+}
 
 bool OmplGlobalPlanner::makePlan(const geometry_msgs::PoseStamped& start, const geometry_msgs::PoseStamped& goal,  std::vector<geometry_msgs::PoseStamped>& plan )
 {
@@ -201,48 +209,101 @@ bool OmplGlobalPlanner::makePlan(const geometry_msgs::PoseStamped& start, const 
 	}
 	
 	// set start and goal state to planner
-	ss.setStartAndGoalStates(ompl_start, ompl_goal);
-	ROS_INFO_STREAM("going to setup problem");
+	// ss.setStartAndGoalStates(ompl_start, ompl_goal);
+
 	//  // Setup problem
-	//  ob::ProblemDefinitionPtr pdef(new ob::ProblemDefinition(si));
-	//  pdef->setStartAndGoalStates(robot_start.get(), robot_goal.get());
-	//  pdef->setOptimizationObjective(ob::OptimizationObjectivePtr(new ob::PathLengthOptimizationObjective(si)));
+	 ob::ProblemDefinitionPtr pdef(new ob::ProblemDefinition(si));
+	 pdef->setStartAndGoalStates(ompl_start, ompl_goal);
+	 pdef->setOptimizationObjective(ob::OptimizationObjectivePtr(new ob::PathLengthOptimizationObjective(si)));
 
 	//  // Setup planner
-	//  // boost::shared_ptr<ompl::geometric::RRTstar> rrtstar(new ompl::geometric::RRTstar(si));
+	 ob::PlannerPtr planner(new og::RRTConnect(si));
+	 // boost::shared_ptr<ompl::geometric::RRTConnect> planner(new ompl::geometric::RRTConnect(si));
 	//  // ob::PlannerPtr planner = rrtstar;
 
 	//  auto planner(std::make_shared<og::RRTConnect>(si));
 
-	//    planner->setProblemDefinition(pdef);
-	//    planner->setup();
-	//    ob::PlannerStatus solved = planner->ob::Planner::solve(0.0);
+	   planner->setProblemDefinition(pdef);
+	   planner->setup();
+	   ob::PlannerStatus solved = planner->ob::Planner::solve(1.0);
 
-	//    // if(solved == ob::PlannerStatus::EXACT_SOLUTION) 
-	//    if (solved)
-	//    {
-	//      // boost::shared_ptr<og::PathGeometric> path = boost::static_pointer_cast<og::PathGeometric>(planner->getProblemDefinition()->getSolutionPath()); 
-	//      ob::PathPtr path = pdef->getSolutionPath();
-	//      // ob::Cost cost = planner->getProblemDefinition()->getOptimizationObjective()->pathCost(path.get());
-	//      ROS_INFO_STREAM("Found solution haha");// with cost: "<<cost.value());
-	//      // pub_path_marker.publish(planning_common::visualization_utils::GetMarker(*path, 0.01));
-	//      ob::PlannerData data(si);
-	//      planner->getPlannerData(data);
-	//      // pub_graph_marker.publish(planning_common::visualization_utils::GetGraph(data, 100, 0.01, 0, 0, 1, 0.3));
-	//    }
-	//    else  
-	//    {
-	//      ROS_INFO_STREAM("No Solution Found");
-	//      ob::PlannerData data(si);
-	//      planner->getPlannerData(data);
-	//      // pub_graph_marker.publish(planning_common::visualization_utils::GetGraph(data, 100, 0.01, 0, 0, 1, 0.3));
-	//    }
-	//    // pub_obstacles_marker_array.publish(obstacle_set.GetMarkerArray(1, 0, 0, 0.7));
+	   // if(solved == ob::PlannerStatus::EXACT_SOLUTION) 
+	   if (solved)
+	   {
+	     // boost::shared_ptr<og::PathGeometric> path = boost::static_pointer_cast<og::PathGeometric>(planner->getProblemDefinition()->getSolutionPath()); 
+	     ob::PathPtr result_path1 = pdef->getSolutionPath();
+	     // ob::Cost cost = planner->getProblemDefinition()->getOptimizationObjective()->pathCost(path.get());
+	     ROS_INFO_STREAM("Found solution haha");// with cost: "<<cost.value());
+	     // pub_path_marker.publish(planning_common::visualization_utils::GetMarker(*path, 0.01));
+        og::PathGeometric& result_path = static_cast<og::PathGeometric&>(*result_path1);
 
-	//    planner->clear();
-	//    pdef->clearSolutionPaths();
-	//    ros::Duration(0.5).sleep();
-	return true;
+	     ob::PlannerData data(si);
+	     planner->getPlannerData(data);
+	     // pub_graph_marker.publish(planning_common::visualization_utils::GetGraph(data, 100, 0.01, 0, 0, 1, 0.3));
 
-	}
-};
+        // Create path:
+        plan.push_back(start);
+
+        // Conversion loop from states to messages:
+        std::vector<ob::State*>& result_states = result_path.getStates();
+        for (std::vector<ob::State*>::iterator it = result_states.begin(); it != result_states.end(); ++it)
+        {
+            // Get the data from the state:
+            double x, y, theta;
+            get_xy_theta(*it, x, y, theta);
+
+            // Place data into the pose:
+            geometry_msgs::PoseStamped ps = goal;
+            ps.header.stamp = ros::Time::now();
+            ps.pose.position.x = x;
+            ps.pose.position.y = y;
+            plan.push_back(ps);
+        }
+
+        plan.push_back(goal);
+
+	   }
+	   else  
+	   {
+	     ROS_INFO_STREAM("No Solution Found");
+	     // ob::PlannerData data(si);
+	     // planner->getPlannerData(data);
+	     // pub_graph_marker.publish(planning_common::visualization_utils::GetGraph(data, 100, 0.01, 0, 0, 1, 0.3));
+	   }
+	   // pub_obstacles_marker_array.publish(obstacle_set.GetMarkerArray(1, 0, 0, 0.7));
+
+	   // planner->clear();
+	   // pdef->clearSolutionPaths();
+	   // ros::Duration(0.5).sleep();
+    //publish the plan for visualization purposes
+    publishPlan(plan);
+    return !plan.empty();
+
+}
+
+void OmplGlobalPlanner::publishPlan(const std::vector<geometry_msgs::PoseStamped>& path)
+{
+    if (!_initialized) {
+        ROS_ERROR(
+                "This planner has not been initialized yet, but it is being used, please call initialize() before use");
+        return;
+    }
+
+    //create a message for the plan 
+    nav_msgs::Path gui_path;
+    gui_path.poses.resize(path.size());
+
+    if (!path.empty()) {
+        gui_path.header.frame_id = path[0].header.frame_id;
+        gui_path.header.stamp = path[0].header.stamp;
+    }
+
+    // Extract the plan in world co-ordinates, we assume the path is all in the same frame
+    for (unsigned int i = 0; i < path.size(); i++) {
+        gui_path.poses[i] = path[i];
+    }
+
+    _plan_pub.publish(gui_path);
+}
+
+}
