@@ -30,7 +30,7 @@ int right_turn = 0;
 
 float old_time = 0;
 
-bool debug = false; // Switch Serial Print / ROS Publisher
+bool debug = true; // Switch Serial Print / ROS Publisher
 
 void setup() {
 
@@ -56,24 +56,34 @@ void setupMsg(std_msgs::Int16MultiArray &msg, ros::Publisher &pub) {
   nh.advertise(pub);
 }
 
+// Data Rate Attenuation
+long int lastPubTime = 0;
+int dataRate  = 20; // ms or 50Hz
+
 void loop() {
 
   read_sensors();
 
-  if (debug) { // Serial Print
-    Serial.print("\t| LEFT | Odom: ");
-    Serial.print(left_odom);
-    Serial.print("\tTurn: ");
-    Serial.print(left_turn);
-    Serial.print("\t| RIGHT | Odom: ");
-    Serial.print(right_odom);
-    Serial.print("\tTurn: ");
-    Serial.print(right_turn);
-    Serial.println("");
-  }
-  else { // ROS Publisher
-    sendMsg(odometry, odometry_pub);
-    nh.spinOnce();
+  long int time = millis();
+  double dt = (time - lastPubTime);
+  if (dt > dataRate) {
+
+    if (debug) { // Serial Print
+      Serial.print("TIME:   | ");
+      Serial.print("\t| LEFT | Odom: ");
+      Serial.print(left_odom);
+      Serial.print("\tTurn: ");
+      Serial.print(left_turn);
+      Serial.print("\t| RIGHT | Odom: ");
+      Serial.print(right_odom);
+      Serial.print("\tTurn: ");
+      Serial.print(right_turn);
+      Serial.println("");
+    }
+    else { // ROS Publisher
+      sendMsg(odometry, odometry_pub);
+      nh.spinOnce();
+    }
   }
 }
 
@@ -96,7 +106,6 @@ void read_sensors() {
   // get steering voltage 1.3 to 2.3V
   left_turn = analogRead(left_turn_pin);
   right_turn = analogRead(right_turn_pin);
-
 }
 
 void sendMsg(std_msgs::Int16MultiArray &msg, ros::Publisher &pub) {

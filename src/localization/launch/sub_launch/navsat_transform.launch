@@ -10,7 +10,7 @@
       <param name="broadcast_utm_transform" value="true"/>
       <param name="publish_filtered_gps" value="true"/>
 
-      <remap from="/imu/data" to="/bno/imu"/>
+      <!-- <remap from="/imu/data" to="/bno/imu"/> -->
       <remap from="/gps/fix" to="/fix"/>
     </node>
 </launch>

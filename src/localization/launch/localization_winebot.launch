@@ -6,6 +6,8 @@
 
     <rosparam command="load" file="$(find localization)/launch/sub_launch/transforms.yaml" />
 
+	<node name="odom_cvt" pkg="localization" type="odom_cvt.py" output="screen"/>
+
 	<!--static transforms-->
 	<node pkg="tf2_ros" type="static_transform_publisher" name="bno_imu" args="-0.37 0 0.57 1.57 0 0 base_link imu_link" />
     <node pkg="tf2_ros" type="static_transform_publisher" name="ppp_gps" args="1.08 0 0.6 0 0 0 base_link /gps" />
@@ -17,7 +19,8 @@
   		<!-- </rosparam> -->
 	<!-- </node> -->
 
-    <node pkg="rosbag" type="play" name="rosbagplay" args="$(find localization)/tests/test_bags/vineyard_02.bag --clock -d 5" required="true">
+		<node pkg="rosbag" type="play" name="rosbagplay" args="$(find localization)/../../bags/gps_test.bag --clock -d 5" required="true">
+
     <!-- <remap from="tf" to="tf_old"/> -->
 	</node>
 
