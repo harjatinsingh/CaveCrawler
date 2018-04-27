@@ -42,10 +42,9 @@ int absoluteRange(float num)
 void JoyArduino::controlCallback(const geometry_msgs::Twist::ConstPtr& msg)
 {
 
-	std_msgs::Int32MultiArray PublishArray;
-	PublishArray.data.clear();
-
-    if(!joy_control){ //switch to autonomous control of robot
+    if(!joy_control || true){ //switch to autonomous control of robot
+        std_msgs::Int32MultiArray PublishArray;
+        PublishArray.data.clear();
 
         //linear velocity mapping
         PublishArray.data.push_back(ConvertToRange(msg->linear.x));
@@ -56,9 +55,9 @@ void JoyArduino::controlCallback(const geometry_msgs::Twist::ConstPtr& msg)
         //max robot speed
         PublishArray.data.push_back(1);
         PublishArray.data.push_back(1); //assume forward mode always for now
-    }
 
-	ArduinoPub.publish(PublishArray);
+        ArduinoPub.publish(PublishArray);
+    }
 
 }
 
@@ -71,6 +70,7 @@ void JoyArduino::joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
 	//map joystick axes to robot controls 
     if(joy->buttons[3] == 1)
     {
+        ROS_WARN("Toggling control of robot");
         joy_control = !joy_control;
     }
 
@@ -125,6 +125,7 @@ void JoyArduino::joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
 
 int main(int argc,char** argv)
 {
+    ROS_WARN("Starting joy arduino");
 	ros::init(argc,argv,"joy_arduno");
 	JoyArduino joy_arduno;
 	ros::spin();
