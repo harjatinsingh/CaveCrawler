@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+
+<launch>
+    <include file="$(find nmea_gps_driver_mod)/launch/gpsbabel_nmea.launch"/>
+    <!--include file="$(velodyne_pointcloud)/launch/VLP16_points.launch"/-->
+    <include file="$(find perception)/launch/cam_lidar.launch"/>
+
+    <node pkg ="um7" name="um7_driver" type="um7_driver">
+	<param name="port" value ="/dev/ttyUSB0"/>
+	<param name="mag_updates" value ="/dev/ttyUSB0"/>
+	<param name="frame_id" value ="imu_link"/>
+	<param name="zero_gyros" value ="true"/>
+    </node>
+    <node ns="arduino" name="odom_arduino" pkg="rosserial_python" type="serial_node.py">
+	<param name="port" value="/dev/serial/by-id/usb-Arduino__www.arduino.cc__0043_75338323535351612152-if00" />
+	<param name="baud" value="115200" />
+    </node>
+    <!--node ns="arudino" name="joy_node" pkg="joy_arduino" type="joy_map"/-->
+
+
+
+</launch>
