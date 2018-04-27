@@ -1,9 +1,0 @@
-<launch> 
-
-  <node name="navfix_to_utm_tf_converter" pkg="nmea_gps_driver_mod" type="navfix_to_utm_tf_converter">
-    <param name="frame_origin" type="string" value="/ned_origin" />
-    <param name="frame_child" type="string" value="/gps_frame" />
-
-  </node>
-</launch>
-
