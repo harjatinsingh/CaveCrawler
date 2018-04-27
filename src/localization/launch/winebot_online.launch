@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<launch>
+
+	<!--EKF -->
+	<!-- <include file="$(find localization)/launch/sub_launch/ekf_winebot.launch"/> -->
+
+	<!-- REMAPPING/FILTERING -->
+	<!-- <node name="odom_cvt" pkg="localization" type="odom_cvt.py" output="screen"/> -->
+	<!-- <include file="$(find localization)/launch/sub_launch/navsat_transform.launch"/> -->
+
+	<!--TRANSFORMS -->
+	<!-- <include file="$(find localization)/launch/sub_launch/hector_trajectory.launch"/> -->
+	<!-- <node pkg="tf2_ros" type="static_transform_publisher" name="bno_imu" args="-0.37 0 0.57 0 0 1.57 base_link imu_link" /> -->
+    <!-- <node pkg="tf2_ros" type="static_transform_publisher" name="ppp_gps" args="1.08 0 0.6 0 0 0 base_link gps" /> -->
+
+	<!--DEVICES -->
+	<node name="raw_odometry" pkg="rosserial_python" type="serial_node.py" output="screen">
+		<param name="port" value="/dev/serial/by-id/usb-Arduino__www.arduino.cc__0043_75338323535351612152-if00"/>
+	 	<param name="baud" value="9600"/>
+	</node>
+
+	<node ns="imu" name="imu" pkg="um7" type="um7_driver">
+		<param name="port" value="/dev/serial/by-id/usb-FTDI_FT232R_USB_UART_A603H9WO-if00-port0"/>
+	</node>
+
+	<node pkg="nmea_navsat_driver" type="nmea_serial_driver" name="navsat" respawn="true">
+		<param name="port" value="/dev/serial/by-id/usb-FTDI_USB__-__Serial-if00-port0"/>
+			<param name="baud" value="9600"/>
+	</node>
+
+	<!--VISUALIZATION -->
+    <!-- <node name="rviz" pkg="rviz" type="rviz" args="-d $(find localization)/launch/sub_launch/localization.rviz"/> -->
+
+</launch>

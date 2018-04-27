@@ -4,7 +4,7 @@ import math
 import tf
 from nav_msgs.msg import Odometry
 from std_msgs.msg import Int16, Int16MultiArray
-from geometry_msgs.msg import Point, Pose, Quaternion, Twist, Vector3
+from geometry_msgs.msg import Point, Pose, Quaternion, QuaternionStamped, Twist, Vector3
 import pdb
 
 wheel_dist = 1
@@ -16,19 +16,19 @@ def update_odom(data):
     global right_odom
     global left_turn_raw
     global right_turn_raw
-    left_odom = raw_odom[0]
-    right_odom = -raw_odom[1] # flipped
-    left_turn_raw = raw_odom[2]
-    right_turn_raw = raw_odom[3]
-
-    left_turn = (-0.0968 * left_turn_raw + 27.1744)*math.pi/180
-    right_turn = (0.1112 * right_turn_raw - 31.0661)*math.pi/180
+    left_odom = raw_odom.quaternion.x # raw_odom[0]
+    right_odom = raw_odom.quaternion.y # raw_odom[1]
+    left_turn_raw = raw_odom.quaternion.z # raw_odom[2]
+    right_turn_raw = raw_odom.quaternion.w #raw_odom[3]
 
     scale = 6e-3# 6e-6
     left_odom = left_odom * scale
     right_odom = right_odom * scale
 
-    print "left_odom", left_odom, "right_odom", right_odom
+    left_turn = (-0.0968 * left_turn_raw + 27.1744)*math.pi/180
+    right_turn = (0.1112 * right_turn_raw - 31.0661)*math.pi/180
+
+    # print "left_odom", left_odom, "right_odom", right_odom
 
     # get forward velocity
     v = (left_odom+right_odom)/2;
@@ -82,7 +82,7 @@ def main():
 
     global odom_pub
     odom_pub = rospy.Publisher("odom", Odometry, queue_size=50)
-    incoming_odom = rospy.Subscriber('/arduino/odometry', Int16MultiArray, update_odom)
+    incoming_odom = rospy.Subscriber('/arduino/raw_odometry', QuaternionStamped, update_odom)
 
 
     r = rospy.Rate(1.0)
