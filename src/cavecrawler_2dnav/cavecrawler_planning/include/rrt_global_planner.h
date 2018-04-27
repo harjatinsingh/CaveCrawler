@@ -73,7 +73,9 @@ class OmplGlobalPlanner : public nav_core::BaseGlobalPlanner
     bool _allow_unknown;
     float  max_footprint_cost;
     std::string tf_prefix_;
-
+    float relative_validity_check_resolution_;
+    float goal_threshold;
+    float solver_time;
     // boost::mutex _mutex;
     
     costmap_2d::Costmap2DROS* _costmap_ros;

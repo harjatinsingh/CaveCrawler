@@ -27,14 +27,22 @@ void OmplGlobalPlanner::initialize(std::string name, costmap_2d::Costmap2DROS* c
         ros::NodeHandle private_nh("~/" + name);
         _costmap_ros = costmap_ros;
         _frame_id = "world";
-        max_footprint_cost = 256;
+        // max_footprint_cost = 256;
+        // relative_validity_check_resolution_ = 0.05;
+        // goal_threshold = 0.1;
+        // solver_time = 1.0;
         _costmap_model = new base_local_planner::CostmapModel(*_costmap_ros->getCostmap());
+        
 
         // private_nh.param("global_frame",  _frame_id, world);
+        ros::NodeHandle private_node_handle_("~");
+
         private_nh.param("allow_unknown", _allow_unknown, true);
-		// private_nh.param("max_footprint_cost", max_footprint_cost, 256.0);
+        private_node_handle_.param("max_footprint_cost", max_footprint_cost,float(256.0));
+        private_node_handle_.param("relative_validity_check_resolution", relative_validity_check_resolution_,float(0.05));
+        private_node_handle_.param("goal_threshold", goal_threshold,float(0.1));
+        private_node_handle_.param("solver_time", solver_time,float(1.0));
 	    // private_nh_.param("max_dist_between_pathframes", max_dist_between_pathframes_, 0.10);
-	    // private_nh_.param("relative_validity_check_resolution", relative_validity_check_resolution_, 0.05);
     	// private_nh_.param("interpolate_path", interpolate_path_, true);
     	// private_nh_.param("publish_diagnostics", publish_diagnostics_, false);
     	// private_nh_.param("Inscribed_radius", inscribed_radius_, 0.2);				// 6/27/2014
@@ -110,6 +118,8 @@ bool OmplGlobalPlanner::makePlan(const geometry_msgs::PoseStamped& start, const 
 {
 
 	ROS_DEBUG("Got a start: %.2f, %.2f, and a goal: %.2f, %.2f", start.pose.position.x, start.pose.position.y, goal.pose.position.x, goal.pose.position.y);
+        		
+	ROS_INFO_STREAM("max_footprint_cost "<<max_footprint_cost<<" relative "<<relative_validity_check_resolution_<<" solver time"<<solver_time<<" thresh "<<goal_threshold);
 	plan.clear();
 	ros::NodeHandle n();
 	std::string global_frame = _frame_id;
@@ -153,7 +163,7 @@ bool OmplGlobalPlanner::makePlan(const geometry_msgs::PoseStamped& start, const 
 	// set state validity checker
 	si->setStateValidityChecker(boost::bind(&OmplGlobalPlanner::isStateValid,this,_1));
 	// // set validity checking resolution
-	si->setStateValidityCheckingResolution(0.05); // dimensionless number as a fraction of the workspace size
+	si->setStateValidityCheckingResolution(relative_validity_check_resolution_); // dimensionless number as a fraction of the workspace size
   	// si->setup();
     double yaw, pitch, roll;
     tf::Pose pose_tf;
@@ -208,7 +218,7 @@ bool OmplGlobalPlanner::makePlan(const geometry_msgs::PoseStamped& start, const 
 
 	// Setup problem
 	ob::ProblemDefinitionPtr pdef(new ob::ProblemDefinition(si));
-	pdef->setStartAndGoalStates(ompl_start, ompl_goal,0.1);  //last term in the goal threshold
+	pdef->setStartAndGoalStates(ompl_start, ompl_goal,goal_threshold);  //last term in the goal threshold
 	pdef->setOptimizationObjective(ob::OptimizationObjectivePtr(new ob::PathLengthOptimizationObjective(si)));
 	// pdef->setOptimizationObjective(cost_objective + length_objective);
 	
@@ -216,7 +226,7 @@ bool OmplGlobalPlanner::makePlan(const geometry_msgs::PoseStamped& start, const 
 	ob::PlannerPtr planner(new og::RRTstar(si));
 	planner->setProblemDefinition(pdef);
 	planner->setup();
-	ob::PlannerStatus solved = planner->ob::Planner::solve(1.0);
+	ob::PlannerStatus solved = planner->ob::Planner::solve(solver_time);
 
 	if (solved)
 	{
