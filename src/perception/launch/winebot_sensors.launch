@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+
+<launch>
+    <include file="$(nmea_gps_driver_mod)/launch/gpsbabel_nmea.launch"/>
+    <!--include file="$(velodyne_pointcloud)/launch/VLP16_points.launch"/-->
+    <include file="$(ueye_cam)/launch/camera_lidar.launch"/>
+
+    <node pkg ="um7" name="um7_driver" type "um7_driver">
+	<param name="port" value ="/dev/ttyUSB0"/>
+	<param name="mag_updates" value ="/dev/ttyUSB0"/>
+	<param name="frame_id" value ="imu_link"/>
+	<param name="zero_gyros" value ="true"/>
+    </node>
+
+</launch>
