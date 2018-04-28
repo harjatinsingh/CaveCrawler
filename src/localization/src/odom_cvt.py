@@ -5,6 +5,7 @@ import tf
 from nav_msgs.msg import Odometry
 from std_msgs.msg import Int16, Int16MultiArray
 from geometry_msgs.msg import Point, Pose, Quaternion, QuaternionStamped, Twist, Vector3
+from sensor_msgs.msg import Imu
 import pdb
 
 wheel_dist = 1
@@ -21,7 +22,7 @@ def update_odom(data):
     left_turn_raw = raw_odom.quaternion.z
     right_turn_raw = raw_odom.quaternion.w
 
-    scale = 0.005 # tuned emperically
+    scale = 0.01 # tuned emperically
     left_odom = left_odom * scale
     right_odom = right_odom * scale
 
@@ -74,7 +75,31 @@ def update_odom(data):
     odom_pub.publish(odom)
 
     # debugging
-    print "v: %0.2f" % v, " omega: %0.2f" % d_heading
+    # print "v: %0.2f" % v, " omega: %0.2f" % d_heading
+
+
+def update_imu(data):
+    new_msg = data
+
+    q = new_msg.orientation
+    roll, pitch, yaw = tf.transformations.euler_from_quaternion([q.x,q.y,q.z,q.w])
+
+    # if abs(yaw) > math.pi:
+    #     print "TRIGGERED!"
+    #     # new_yaw = -yaw
+    #     yaw = -yaw
+    # else:
+    #     # new_yaw = yaw
+    #     yaw = yaw # + math.pi
+
+    print roll, pitch, yaw
+
+    # q = tf.transformations.quaternion_from_euler(roll, pitch, yaw)
+    # new_msg.orientation.x = q[0]
+    # new_msg.orientation.y = q[1]
+    # new_msg.orientation.z = q[2]
+    # new_msg.orientation.w = q[3]
+    # imu_pub.publish(new_msg)
 
 
 def main():
@@ -85,6 +110,9 @@ def main():
     odom_pub = rospy.Publisher("odom", Odometry, queue_size=50)
     incoming_odom = rospy.Subscriber('/raw_odometry', QuaternionStamped, update_odom)
 
+    global imu_pub
+    imu_pub = rospy.Publisher("/imu/data", Imu, queue_size=50)
+    incoming_imu = rospy.Subscriber('/imu/raw', Imu, update_imu)
 
     r = rospy.Rate(1.0)
     while not rospy.is_shutdown():
