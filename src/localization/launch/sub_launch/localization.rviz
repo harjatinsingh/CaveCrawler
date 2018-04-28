@@ -4,17 +4,13 @@ Panels:
     Name: Displays
     Property Tree Widget:
       Expanded:
-        - /Global Options1
-        - /Status1
-        - /Grid1
-        - /Path1
-        - /Odometry1
+        - /TF1
         - /Odometry1/Shape1
         - /Odometry1/Covariance1
         - /Odometry1/Covariance1/Position1
         - /Marker1/Namespaces1
       Splitter Ratio: 0.5
-    Tree Height: 359
+    Tree Height: 747
   - Class: rviz/Selection
     Name: Selection
   - Class: rviz/Tool Properties
@@ -52,7 +48,7 @@ Visualization Manager:
         Y: 0
         Z: 0
       Plane: XY
-      Plane Cell Count: 10
+      Plane Cell Count: 100
       Reference Frame: odom
       Value: true
     - Class: rviz/TF
@@ -65,6 +61,8 @@ Visualization Manager:
         gps:
           Value: true
         imu_link:
+          Value: true
+        lidar_link:
           Value: true
         odom:
           Value: true
@@ -81,6 +79,8 @@ Visualization Manager:
             gps:
               {}
             imu_link:
+              {}
+            lidar_link:
               {}
           utm:
             {}
@@ -178,21 +178,13 @@ Visualization Manager:
       Unreliable: false
       Value: false
     - Class: rviz/Marker
-      Enabled: true
+      Enabled: false
       Marker Topic: visualization_marker
       Name: Marker
       Namespaces:
         {}
       Queue Size: 100
-      Value: true
-    - Class: rviz/Marker
-      Enabled: true
-      Marker Topic: /scorpion
-      Name: Scorpion_mesh
-      Namespaces:
-        {}
-      Queue Size: 100
-      Value: true
+      Value: false
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -218,25 +210,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 27.9924011
+      Distance: 10.7477522
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.0599999987
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 1.53319848
-        Y: 16.6083183
-        Z: -8.85240078
+        X: 3.34394884
+        Y: -0.75847441
+        Z: -1.216259
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.0500000007
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.00999999978
-      Pitch: 0.58979708
+      Pitch: 0.604797006
       Target Frame: odom
       Value: Orbit (rviz)
-      Yaw: 4.70160961
+      Yaw: 2.66343451
     Saved: ~
 Window Geometry:
   Displays:

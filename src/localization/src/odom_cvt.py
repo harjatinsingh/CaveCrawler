@@ -11,24 +11,22 @@ wheel_dist = 1
 w = 0.9
 
 def update_odom(data):
-    raw_odom = data.data
+    raw_odom = data
     global left_odom
     global right_odom
     global left_turn_raw
     global right_turn_raw
-    left_odom = raw_odom.quaternion.x # raw_odom[0]
-    right_odom = raw_odom.quaternion.y # raw_odom[1]
-    left_turn_raw = raw_odom.quaternion.z # raw_odom[2]
-    right_turn_raw = raw_odom.quaternion.w #raw_odom[3]
+    left_odom = raw_odom.quaternion.x
+    right_odom = raw_odom.quaternion.y
+    left_turn_raw = raw_odom.quaternion.z
+    right_turn_raw = raw_odom.quaternion.w
 
-    scale = 6e-3# 6e-6
+    scale = 0.005 # tuned emperically
     left_odom = left_odom * scale
     right_odom = right_odom * scale
 
     left_turn = (-0.0968 * left_turn_raw + 27.1744)*math.pi/180
     right_turn = (0.1112 * right_turn_raw - 31.0661)*math.pi/180
-
-    # print "left_odom", left_odom, "right_odom", right_odom
 
     # get forward velocity
     v = (left_odom+right_odom)/2;
@@ -52,7 +50,7 @@ def update_odom(data):
     if abs(turn_centre) < 1e5 and not v == 0:
         A = turn_centre**2 - v**2;
         try:
-            d_heading = direction*math.atan2(v,math.sqrt(A));
+            d_heading = -direction*math.atan2(v,math.sqrt(A));
         except:
             d_heading = 0;
     else:
@@ -75,6 +73,9 @@ def update_odom(data):
     global odom_pub
     odom_pub.publish(odom)
 
+    # debugging
+    print "v: %0.2f" % v, " omega: %0.2f" % d_heading
+
 
 def main():
 
@@ -82,7 +83,7 @@ def main():
 
     global odom_pub
     odom_pub = rospy.Publisher("odom", Odometry, queue_size=50)
-    incoming_odom = rospy.Subscriber('/arduino/raw_odometry', QuaternionStamped, update_odom)
+    incoming_odom = rospy.Subscriber('/raw_odometry', QuaternionStamped, update_odom)
 
 
     r = rospy.Rate(1.0)
