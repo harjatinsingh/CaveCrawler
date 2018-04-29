@@ -22,9 +22,8 @@ def update_odom(data):
     left_turn_raw = raw_odom.quaternion.z
     right_turn_raw = raw_odom.quaternion.w
 
-    scale = 0.01 # tuned emperically
-    left_odom = left_odom * scale
-    right_odom = right_odom * scale
+    left_odom = left_odom * odometry_scale
+    right_odom = right_odom * odometry_scale
 
     left_turn = (-0.0968 * left_turn_raw + 27.1744)*math.pi/180
     right_turn = (0.1112 * right_turn_raw - 31.0661)*math.pi/180
@@ -105,6 +104,9 @@ def update_imu(data):
 def main():
 
     rospy.init_node('odom_cvt')
+
+    global odometry_scale
+    odometry_scale = rospy.get_param('odometry_scale')
 
     global odom_pub
     odom_pub = rospy.Publisher("odom", Odometry, queue_size=50)
