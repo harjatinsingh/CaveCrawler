@@ -5,7 +5,8 @@ import tf
 from nav_msgs.msg import Odometry
 from std_msgs.msg import Int16, Int16MultiArray
 from geometry_msgs.msg import Point, Pose, Quaternion, QuaternionStamped, Twist, Vector3
-from sensor_msgs.msg import Imu
+from sensor_msgs.msg import Imu, NavSatFix
+import numpy as np
 import pdb
 
 wheel_dist = 1
@@ -41,12 +42,7 @@ def update_odom(data):
     turn_centre_right = 0.5 / math.tan(right_turn)
     turn_centre = (turn_centre_left + turn_centre_right)/2;
 
-    # get turn centre from odom delta
-    # turn_centre_delta = wheel_dist/2 * (left_odom+right_odom)/(left_odom-right_odom);
-
     # compute delta in heading
-    # turn_centre = turn_centre_angle*(w) + turn_centre_delta*(1-w);
-
     if abs(turn_centre) < 1e5 and not v == 0:
         A = turn_centre**2 - v**2;
         try:
@@ -73,49 +69,42 @@ def update_odom(data):
     global odom_pub
     odom_pub.publish(odom)
 
-    # debugging
     # print "v: %0.2f" % v, " omega: %0.2f" % d_heading
 
 
-def update_imu(data):
-    new_msg = data
+def update_gps(data):
+    global ma
+    ma = np.vstack(([data.latitude,data.longitude],ma))
+    if ma.shape[0] > gps_ma_samples:
+        ma = ma[0:5,:]
 
-    q = new_msg.orientation
-    roll, pitch, yaw = tf.transformations.euler_from_quaternion([q.x,q.y,q.z,q.w])
+    avg = np.ma.average(ma, axis=0)
+    data.latitude = avg[0]
+    data.longitude = avg[1]
 
-    # if abs(yaw) > math.pi:
-    #     print "TRIGGERED!"
-    #     # new_yaw = -yaw
-    #     yaw = -yaw
-    # else:
-    #     # new_yaw = yaw
-    #     yaw = yaw # + math.pi
-
-    # print "roll: %0.2f" % (roll*180/math.pi), "%0.2f" % (pitch*180/math.pi), "%0.2f" % (yaw*180/math.pi)
-
-    # q = tf.transformations.quaternion_from_euler(roll, pitch, yaw)
-    # new_msg.orientation.x = q[0]
-    # new_msg.orientation.y = q[1]
-    # new_msg.orientation.z = q[2]
-    # new_msg.orientation.w = q[3]
-    # imu_pub.publish(new_msg)
+    gps_pub.publish(data)
 
 
 def main():
-
     rospy.init_node('odom_cvt')
 
+    # Odometry Pre-Processing
     global odometry_scale
     odometry_scale = rospy.get_param('odometry_scale')
-
     global odom_pub
     odom_pub = rospy.Publisher("odom", Odometry, queue_size=50)
     incoming_odom = rospy.Subscriber('/raw_odometry', QuaternionStamped, update_odom)
 
-    # global imu_pub
-    # imu_pub = rospy.Publisher("/imu/data", Imu, queue_size=50)
-    # incoming_imu = rospy.Subscriber('/imu/raw', Imu, update_imu)
+    # GPS MA Filter
+    global gps_pub
+    gps_pub = rospy.Publisher("/fix_filtered", NavSatFix, queue_size=50)
+    incoming_gps = rospy.Subscriber('/fix', NavSatFix, update_gps)
+    global gps_ma_samples
+    gps_ma_samples = rospy.get_param('gps_ma_samples')
+    global ma
+    ma = np.zeros(shape=(0,2))
 
+    # Chill out and do fuck all
     r = rospy.Rate(1.0)
     while not rospy.is_shutdown():
         r.sleep()
