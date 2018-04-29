@@ -22,11 +22,6 @@
 	<!-- PLAYBACK -->
 	<node pkg="rosbag" type="play" name="rosbagplay" args="$(find localization)/bags/05.bag --clock -d 5 -r 1" required="true"/>
 
-		<!-- <node pkg="gps_common" type="utm_odometry_node" name="gps_common">
-			<param name="child_frame_id" value="gps_odom"/>
-		 	<param name="frame_id" value="odom"/>
-		</node> -->
-
 		<!--VISUALIZATION -->
   <node name="rviz" pkg="rviz" type="rviz" args="-d $(find localization)/launch/sub_launch/localization.rviz"/>
 
