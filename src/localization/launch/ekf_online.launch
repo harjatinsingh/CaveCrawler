@@ -20,11 +20,9 @@
 
 	<!-- REMAPPING/FILTERING -->
 	<param name="odometry_scale" value="0.01"/>
-	<node name="odom_cvt" pkg="localization" type="odom_cvt.py" output="screen"/>
+	<param name="gps_ma_samples" value="5"/>
+	<node name="odom_cvt" pkg="localization" type="odom_cvt.py"/>
 	<include file="$(find localization)/launch/sub_launch/navsat_transform.launch"/>
-
-	<!-- EKF -->
-	<include file="$(find localization)/launch/sub_launch/ekf.launch"/>
 
 	<!--TRANSFORMS-->
 	<include file="$(find localization)/launch/sub_launch/hector_trajectory.launch"/>
@@ -32,6 +30,9 @@
 	<node pkg="tf2_ros" type="static_transform_publisher" name="imu_frame" args="0.3302 0 0.7112 			1.57 0 0 base_link imu_link" />
   <node pkg="tf2_ros" type="static_transform_publisher" name="gps_frame" args="0.8382 0 1.5494 				0 0 0 base_link /gps" />
   <node pkg="tf2_ros" type="static_transform_publisher" name="velodyne_frame" args="1.1684 0 1.6256 	0 0 0 base_link velodyne" />
+
+	<!-- EKF -->
+	<include file="$(find localization)/launch/sub_launch/ekf.launch"/>
 
 	<!--VISUALIZATION -->
     <node name="rviz" pkg="rviz" type="rviz" args="-d $(find localization)/launch/sub_launch/localization.rviz"/>
