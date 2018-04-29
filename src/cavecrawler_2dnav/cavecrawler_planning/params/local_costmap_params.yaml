@@ -3,7 +3,7 @@ local_costmap:
    robot_base_frame: base_link #vehicle
   #  update_frequency: 20.0
    update_frequency: 5.0
-   publish_frequency: 5.0
+   publish_frequency: 2.0
   #  width: 10.0
    width: 8.0
   #  height: 10.0
