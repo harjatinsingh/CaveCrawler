@@ -1,0 +1,19 @@
+1. sudo apt-get install ros-kinetic-joy
+
+2. git clone https://github.com/ros-planning/navigation.git
+	navigation/move_base/Cmake file line 29 - remove the generate_dynamic_reconfigure_options
+
+3. sudo apt-get install ros-kinetic-geographic-msgs
+
+4. sudo apt-get install ros-kinetic-map-server
+
+5. sudo apt-get install ros-kinetic-geodesy
+
+6. rosdep install --from-paths src --ignore-src --rosdistro kinetic -y (RUN THIS WHENEVER U FACE ISSUE)
+
+7. sudo apt-get install ros-kinetic-move-base
+
+8. sudo apt-get install ros-kinetic-ompl
+
+
+
