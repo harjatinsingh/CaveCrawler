@@ -4,13 +4,10 @@ Panels:
     Name: Displays
     Property Tree Widget:
       Expanded:
-        - /Global Options1
-        - /TF1
         - /Odometry1/Shape1
         - /Odometry1/Covariance1
         - /Odometry1/Covariance1/Position1
         - /Marker1/Namespaces1
-        - /GPS_test1
         - /GPS_test1/Shape1
         - /GPS_test1/Covariance1
       Splitter Ratio: 0.544444442

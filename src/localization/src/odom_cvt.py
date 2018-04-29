@@ -92,7 +92,7 @@ def update_imu(data):
     #     # new_yaw = yaw
     #     yaw = yaw # + math.pi
 
-    print roll, pitch, yaw
+    # print "roll: %0.2f" % (roll*180/math.pi), "%0.2f" % (pitch*180/math.pi), "%0.2f" % (yaw*180/math.pi)
 
     # q = tf.transformations.quaternion_from_euler(roll, pitch, yaw)
     # new_msg.orientation.x = q[0]
@@ -110,9 +110,9 @@ def main():
     odom_pub = rospy.Publisher("odom", Odometry, queue_size=50)
     incoming_odom = rospy.Subscriber('/raw_odometry', QuaternionStamped, update_odom)
 
-    global imu_pub
-    imu_pub = rospy.Publisher("/imu/data", Imu, queue_size=50)
-    incoming_imu = rospy.Subscriber('/imu/raw', Imu, update_imu)
+    # global imu_pub
+    # imu_pub = rospy.Publisher("/imu/data", Imu, queue_size=50)
+    # incoming_imu = rospy.Subscriber('/imu/raw', Imu, update_imu)
 
     r = rospy.Rate(1.0)
     while not rospy.is_shutdown():

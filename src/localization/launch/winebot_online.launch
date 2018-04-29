@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no" ?>
 <launch>
 
-	<!--EKF -->
+	<!-- EKF -->
 	<include file="$(find localization)/launch/sub_launch/ekf_winebot.launch"/>
 
 	<!-- REMAPPING/FILTERING -->
+	<include file="$(find localization)/launch/sub_launch/navsat_transform.launch"/>
 	<node name="odom_cvt" pkg="localization" type="odom_cvt.py" output="screen"/>
-	<!-- <include file="$(find localization)/launch/sub_launch/navsat_transform.launch"/> -->
+	<remap from="/imu/imu/data" to="/imu/data"/>
 
-	<!--TRANSFORMS -->
+	<!--TRANSFORMS-->
 	<include file="$(find localization)/launch/sub_launch/hector_trajectory.launch"/>
-	<node pkg="tf2_ros" type="static_transform_publisher" name="bno_imu" args="-0.37 0 0.57 0 0 1.57 base_link imu_link" />
-    <node pkg="tf2_ros" type="static_transform_publisher" name="ppp_gps" args="1.08 0 0.6 0 0 0 base_link gps" />
+	<node pkg="tf2_ros" type="static_transform_publisher" name="odom" args="0 0 0 0 0 0 world odom" />
+	<node pkg="tf2_ros" type="static_transform_publisher" name="imu" args="0.3302 0 0.7112 			1.57 0 0 base_link imu_link" />
+  <node pkg="tf2_ros" type="static_transform_publisher" name="gps" args="0.8382 0 1.5494 				0 0 0 base_link /gps" />
+  <node pkg="tf2_ros" type="static_transform_publisher" name="velodyne" args="1.1684 0 1.6256 	0 0 0 base_link lidar_link" />
 
 	<!--DEVICES -->
-
-  <node pkg="rosbag" type="play" name="rosbagplay" args="$(find localization)../../bags/outdoors/02.bag --clock -d 5" required="true">
-
-	<!-- <node name="raw_odometry" pkg="rosserial_python" type="serial_node.py" output="screen">
+	<node name="raw_odometry" pkg="rosserial_python" type="serial_node.py" output="screen">
 		<param name="port" value="/dev/serial/by-id/usb-Arduino__www.arduino.cc__0043_75338323535351612152-if00"/>
 	 	<param name="baud" value="9600"/>
 	</node>
@@ -29,9 +29,10 @@
 	<node pkg="nmea_navsat_driver" type="nmea_serial_driver" name="navsat" respawn="true">
 		<param name="port" value="/dev/serial/by-id/usb-FTDI_USB__-__Serial-if00-port0"/>
 			<param name="baud" value="9600"/>
-	</node> -->
+	</node>
 
 </node>
+
 	<!--VISUALIZATION -->
     <node name="rviz" pkg="rviz" type="rviz" args="-d $(find localization)/launch/sub_launch/localization.rviz"/>
 
