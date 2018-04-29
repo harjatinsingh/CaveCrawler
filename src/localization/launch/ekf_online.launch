@@ -1,38 +1,37 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no" ?>
 <launch>
 
-	<!-- EKF -->
-	<include file="$(find localization)/launch/sub_launch/ekf.launch"/>
-
-	<!-- REMAPPING/FILTERING -->
-	<include file="$(find localization)/launch/sub_launch/navsat_transform.launch"/>
-	<node name="odom_cvt" pkg="localization" type="odom_cvt.py" output="screen"/>
-	<param name="odometry_scale" value="0.01"/>
-	<remap from="/imu/imu/data" to="/imu/data"/>
-
-	<!--TRANSFORMS-->
-	<include file="$(find localization)/launch/sub_launch/hector_trajectory.launch"/>
-	<node pkg="tf2_ros" type="static_transform_publisher" name="odom" args="0 0 0 0 0 0 world odom" />
-	<node pkg="tf2_ros" type="static_transform_publisher" name="imu" args="0.3302 0 0.7112 			1.57 0 0 base_link imu_link" />
-  <node pkg="tf2_ros" type="static_transform_publisher" name="gps" args="0.8382 0 1.5494 				0 0 0 base_link /gps" />
-  <node pkg="tf2_ros" type="static_transform_publisher" name="velodyne" args="1.1684 0 1.6256 	0 0 0 base_link lidar_link" />
+	<param name ="/use_sim_time" value="false"/>
 
 	<!--DEVICES -->
 	<node name="raw_odometry" pkg="rosserial_python" type="serial_node.py" output="screen">
 		<param name="port" value="/dev/serial/by-id/usb-Arduino__www.arduino.cc__0043_75338323535351612152-if00"/>
-	 	<param name="baud" value="9600"/>
+		<param name="baud" value="115200"/>
 	</node>
 
-	<node ns="imu" name="imu" pkg="um7" type="um7_driver">
+	<node name="imu" pkg="um7" type="um7_driver">
 		<param name="port" value="/dev/serial/by-id/usb-FTDI_FT232R_USB_UART_A603H9WO-if00-port0"/>
 	</node>
 
 	<node pkg="nmea_navsat_driver" type="nmea_serial_driver" name="navsat" respawn="true">
 		<param name="port" value="/dev/serial/by-id/usb-FTDI_USB__-__Serial-if00-port0"/>
-			<param name="baud" value="9600"/>
+		<param name="baud" value="9600"/>
 	</node>
 
-</node>
+	<!-- REMAPPING/FILTERING -->
+	<param name="odometry_scale" value="0.01"/>
+	<node name="odom_cvt" pkg="localization" type="odom_cvt.py" output="screen"/>
+	<include file="$(find localization)/launch/sub_launch/navsat_transform.launch"/>
+
+	<!-- EKF -->
+	<include file="$(find localization)/launch/sub_launch/ekf.launch"/>
+
+	<!--TRANSFORMS-->
+	<include file="$(find localization)/launch/sub_launch/hector_trajectory.launch"/>
+	<node pkg="tf2_ros" type="static_transform_publisher" name="odom_frame" args="0 0 0 0 0 0 world odom" />
+	<node pkg="tf2_ros" type="static_transform_publisher" name="imu_frame" args="0.3302 0 0.7112 			1.57 0 0 base_link imu_link" />
+  <node pkg="tf2_ros" type="static_transform_publisher" name="gps_frame" args="0.8382 0 1.5494 				0 0 0 base_link /gps" />
+  <node pkg="tf2_ros" type="static_transform_publisher" name="velodyne_frame" args="1.1684 0 1.6256 	0 0 0 base_link lidar_link" />
 
 	<!--VISUALIZATION -->
     <node name="rviz" pkg="rviz" type="rviz" args="-d $(find localization)/launch/sub_launch/localization.rviz"/>

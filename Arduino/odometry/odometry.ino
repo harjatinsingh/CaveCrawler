@@ -35,11 +35,10 @@ bool debug = false; // Switch Serial Print / ROS Publisher
 void setup() {
 
   if (debug) {
-    Serial.begin(9600);
-    Serial.println("Serial Connection @ 9600 Baud");
+    Serial.begin(115200);
   }
   else {
-    nh.getHardware()->setBaud(9600);
+    nh.getHardware()->setBaud(115200);
     nh.initNode();
     nh.advertise(odometry_pub);
   }

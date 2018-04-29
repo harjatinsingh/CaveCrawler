@@ -2,7 +2,7 @@
 <launch>
 
 	<node name="odom_cvt" pkg="localization" type="odom_cvt.py" output="screen">
-		<param name="quat_mode" value="false"/>
+		<param name="quat_mode" value="true"/>
 	</node>
 
 	<remap from="/imu/imu/data" to="/imu/raw"/>

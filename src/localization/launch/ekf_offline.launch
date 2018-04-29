@@ -10,7 +10,7 @@
 	<param name="odometry_scale" value="0.01"/>
 	<remap from="/imu/imu/data" to="/imu/data"/>
 
-	<!--TRANSFORMS-->
+	<!-- TRANSFORMS -->
 	<include file="$(find localization)/launch/sub_launch/hector_trajectory.launch"/>
 	<node pkg="tf2_ros" type="static_transform_publisher" name="odom" args="0 0 0 0 0 0 world odom" />
 	<node pkg="tf2_ros" type="static_transform_publisher" name="imu" args="0.3302 0 0.7112 			1.57 0 0 base_link imu_link" />
