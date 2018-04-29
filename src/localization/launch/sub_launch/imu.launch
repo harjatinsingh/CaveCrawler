@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<launch>
+
+	<node name="odom_cvt" pkg="localization" type="odom_cvt.py" output="screen">
+		<param name="quat_mode" value="false"/>
+	</node>
+
+	<remap from="/imu/imu/data" to="/imu/raw"/>
+
+	<node ns="imu" name="imu" pkg="um7" type="um7_driver">
+		<param name="port" value="/dev/serial/by-id/usb-FTDI_FT232R_USB_UART_A603H9WO-if00-port0"/>
+	</node>
+
+</launch>

@@ -1,0 +1,6 @@
+<launch>
+	<node pkg="nmea_navsat_driver" type="nmea_serial_driver" name="navsat" respawn="true">
+  		<param name="port" value="/dev/serial/by-id/usb-Prolific_Technology_Inc._USB-Serial_Controller-if00-port0"/>
+  		<param name="baud" value="4800"/>
+	</node>
+</launch>
