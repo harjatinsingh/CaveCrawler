@@ -5,10 +5,12 @@
 	<include file="$(find localization)/launch/sub_launch/ekf.launch"/>
 
 	<!-- REMAPPING/FILTERING -->
-	<include file="$(find localization)/launch/sub_launch/navsat_transform.launch"/>
-	<node name="odom_cvt" pkg="localization" type="odom_cvt.py" output="screen"/>
 	<param name="odometry_scale" value="0.01"/>
-	<remap from="/imu/imu/data" to="/imu/data"/>
+	<param name="gps_ma_samples" value="5"/>
+	<node name="odom_cvt" pkg="localization" type="odom_cvt.py"/>
+	<include file="$(find localization)/launch/sub_launch/navsat_transform.launch"/>
+
+	<remap from="/imu/imu/data" to="/imu/data"/> <!-- Whoops -->
 
 	<!-- TRANSFORMS -->
 	<include file="$(find localization)/launch/sub_launch/hector_trajectory.launch"/>
@@ -18,14 +20,7 @@
   <node pkg="tf2_ros" type="static_transform_publisher" name="velodyne" args="1.1684 0 1.6256 	0 0 0 base_link lidar_link" />
 
 	<!-- PLAYBACK -->
-	<node pkg="rosbag" type="play" name="rosbagplay" args="$(find localization)/bags/05.bag --clock -d 5 -r 1" required="true">
-
-		<!-- <node pkg="gps_common" type="utm_odometry_node" name="gps_common">
-			<param name="child_frame_id" value="gps_odom"/>
-		 	<param name="frame_id" value="odom"/>
-		</node> -->
-
-	</node>
+	<node pkg="rosbag" type="play" name="rosbagplay" args="$(find localization)/bags/05.bag --clock -d 5 -r 1" required="true"/>
 
 		<!--VISUALIZATION -->
   <node name="rviz" pkg="rviz" type="rviz" args="-d $(find localization)/launch/sub_launch/localization.rviz"/>
