@@ -2,8 +2,6 @@
     <arg name="output_final_position" default="false" />
     <arg name="output_location" default="test.txt" />
 
-    <param name="/use_sim_time" value="true" />
-
     <node name="ekf" pkg="robot_localization" type="ekf_localization_node" clear_params="true" >
 
       <param name="frequency" value="30"/>
