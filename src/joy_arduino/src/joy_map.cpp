@@ -11,6 +11,7 @@ class JoyArduino
 		void joyCallback(const sensor_msgs::Joy::ConstPtr& joy);
 		void controlCallback(const geometry_msgs::Twist::ConstPtr& msg);
 		bool joy_control;
+		bool crab_mode;
 		ros::NodeHandle nh;
 		ros::Publisher ArduinoPub;
 		ros::Subscriber JoySub;
@@ -53,13 +54,25 @@ void JoyArduino::controlCallback(const geometry_msgs::Twist::ConstPtr& msg)
 		//linear velocity mapping
 		ROS_INFO_STREAM("forward vel");
 		ROS_INFO_STREAM(msg->linear.x);
+		ROS_INFO_STREAM("angular vel");
+		ROS_INFO_STREAM(msg->angular.z);
 		PublishArray.data.push_back(ConvertToRange(msg->linear.x));
 
 		//steering mapping
-		PublishArray.data.push_back(ConvertToRange(msg->angular.z));
+		PublishArray.data.push_back(ConvertToRange(-msg->angular.z));
 
 		//max robot speed
-		PublishArray.data.push_back(absoluteRange(-.75));
+		PublishArray.data.push_back(absoluteRange(-.5));
+
+		if(crab_mode && msg->linear.x !=0){
+			crab_mode = false;
+			PublishArray.data.push_back(1);//switch to forward mode
+		} else if(!crab_mode && msg->linear.x==0 && msg->angular.z!= 0){
+			crab_mode = true;
+			PublishArray.data.push_back(2);//switch to crab mode
+		}else{
+			PublishArray.data.push_back(0);//continue in previous mode
+		}
 
 		PublishArray.data.push_back(0);//continue in previous mode
 		PublishArray.data.push_back(0);//continue in previous mode
@@ -106,10 +119,12 @@ void JoyArduino::joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
 		if(joy->buttons[5] == 1)
 		{
 			PublishArray.data.push_back(1); //forward mode	
+			crab_mode = false;
 		}
 		else if (joy->buttons[4] == 1)
 		{
 			PublishArray.data.push_back(2); //crab mode
+			crab_mode = true;
 		}
 		else
 		{
