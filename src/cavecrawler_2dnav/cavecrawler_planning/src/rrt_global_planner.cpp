@@ -8,7 +8,7 @@ using namespace std;
 
 namespace ompl_global_planner {
 
-OmplGlobalPlanner::OmplGlobalPlanner () : _costmap_ros(NULL), _initialized(false), _allow_unknown(true),_space(new ob::SE2StateSpace),_costmap_model(NULL)
+OmplGlobalPlanner::OmplGlobalPlanner () : _costmap_ros(NULL), _initialized(false), _allow_unknown(true),_costmap_model(NULL)
 {
 	ROS_INFO_STREAM("constructor 1");
 }
@@ -72,6 +72,7 @@ bool OmplGlobalPlanner::isStateValid(const ob::State *state)
     x = state->as<ob::SE2StateSpace::StateType>()->getX();
     y = state->as<ob::SE2StateSpace::StateType>()->getY();
     theta = state->as<ob::SE2StateSpace::StateType>()->getYaw();
+    theta = angles::normalize_angle(theta);
 
 	cost = _costmap_model->footprintCost(x, y, theta, _costmap_ros->getRobotFootprint());
 	if (found_plan==true)
@@ -133,6 +134,7 @@ bool OmplGlobalPlanner::makePlan(const geometry_msgs::PoseStamped& start, const 
 	poseStampedMsgToTF(goal,goal_tf);
 	poseStampedMsgToTF(start,start_tf);
 
+	ob::StateSpacePtr _space(new ob::SE2StateSpace());
 	// get bounds from worldmap and set it to bounds for the planner
 	// as goal and map are set in same frame (checked above) we can directly
 	// get the extensions of the statespace from the map-prms		
@@ -212,6 +214,12 @@ bool OmplGlobalPlanner::makePlan(const geometry_msgs::PoseStamped& start, const 
 		return false;
 	}
 
+	// ss.setStartAndGoalStates(ompl_start, ompl_goal);
+	// ob::PlannerPtr planner(new og::RRTstar(si));
+	// ss.setPlanner(planner);
+	// bool solved = ss.solve(1.0);	
+
+
     // Optimize criteria:
    
     // ob::OptimizationObjectivePtr cost_objective(new CostMapObjective(*this, si));
@@ -260,6 +268,7 @@ bool OmplGlobalPlanner::makePlan(const geometry_msgs::PoseStamped& start, const 
 			// Place data into the pose:
 			geometry_msgs::PoseStamped ps = goal;
 			ps.header.stamp = ros::Time::now();
+			ps.header.frame_id =  _costmap_ros->getGlobalFrameID();
 			ps.pose.position.x = x;
 			ps.pose.position.y = y;
 			plan.push_back(ps);
