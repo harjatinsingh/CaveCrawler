@@ -33,7 +33,6 @@ void OmplGlobalPlanner::initialize(std::string name, costmap_2d::Costmap2DROS* c
         // solver_time = 1.0;
         _costmap_model = new base_local_planner::CostmapModel(*_costmap_ros->getCostmap());
         
-
         // private_nh.param("global_frame",  _frame_id, world);
         ros::NodeHandle private_node_handle_("~");
 
@@ -75,6 +74,8 @@ bool OmplGlobalPlanner::isStateValid(const ob::State *state)
     theta = state->as<ob::SE2StateSpace::StateType>()->getYaw();
 
 	cost = _costmap_model->footprintCost(x, y, theta, _costmap_ros->getRobotFootprint());
+	if (found_plan==true)
+		ROS_INFO_STREAM("cost "<<cost);
 
 	if( (cost >= 0) && (cost < max_footprint_cost) )
 	{
@@ -227,9 +228,11 @@ bool OmplGlobalPlanner::makePlan(const geometry_msgs::PoseStamped& start, const 
 	planner->setProblemDefinition(pdef);
 	planner->setup();
 	ob::PlannerStatus solved = planner->ob::Planner::solve(solver_time);
+	found_plan = false;
 
 	if (solved)
-	{
+	{	
+		found_plan = true;
 		// boost::shared_ptr<og::PathGeometric> path = boost::static_pointer_cast<og::PathGeometric>(planner->getProblemDefinition()->getSolutionPath()); 
 		ob::PathPtr result_path1 = pdef->getSolutionPath();
 		// ob::Cost cost = planner->getProblemDefinition()->getOptimizationObjective()->pathCost(path.get());
@@ -243,12 +246,13 @@ bool OmplGlobalPlanner::makePlan(const geometry_msgs::PoseStamped& start, const 
 
 		// Create path:
 		plan.push_back(start);
-
+		ROS_INFO_STREAM("Start "<<start);
 		// Conversion loop from states to messages:
 		std::vector<ob::State*>& result_states = result_path.getStates();
-		ROS_INFO_STREAM("result states "<<result_states.size());
+		
 		for (std::vector<ob::State*>::iterator it = result_states.begin(); it != result_states.end(); ++it)
 		{
+			
 			// Get the data from the state:
 			double x, y, theta;
 			get_xy_theta(*it, x, y, theta);
@@ -259,11 +263,12 @@ bool OmplGlobalPlanner::makePlan(const geometry_msgs::PoseStamped& start, const 
 			ps.pose.position.x = x;
 			ps.pose.position.y = y;
 			plan.push_back(ps);
-			ROS_INFO_STREAM("NEW POSE "<<ps);
+			ROS_INFO_STREAM("PLAN "<<ps);
+			isStateValid(*it);
 		}
 
 		plan.push_back(goal);
-
+		ROS_INFO_STREAM("goal "<<goal);
 	}
 	else  
 	{

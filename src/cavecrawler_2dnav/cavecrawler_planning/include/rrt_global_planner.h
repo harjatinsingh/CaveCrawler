@@ -76,6 +76,7 @@ class OmplGlobalPlanner : public nav_core::BaseGlobalPlanner
     float relative_validity_check_resolution_;
     float goal_threshold;
     float solver_time;
+    bool found_plan;
     // boost::mutex _mutex;
     
     costmap_2d::Costmap2DROS* _costmap_ros;
