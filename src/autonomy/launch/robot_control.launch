@@ -4,7 +4,7 @@
     <include file="$(find localization)/launch/ekf_online.launch"/>
     <include file="$(find velodyne_pointcloud)/launch/VLP16_points.launch"/>
 
-    <node pkg="autonomy" type="final_code" name="final_code" output="screen"/>
+    <node pkg="autonomy" type="final_code" name="final_code"/>
     
     <node pkg="nodelet" type="nodelet" name="pcl_manager" args="manager" output="screen" />
         <!-- Run a Crop box filter to remove the additional points to clean NaNs -->
@@ -25,7 +25,7 @@
     
     <!-- include file="$(find autonomy)/launch/cam_lidar.launch"/-->
 
-    <include file="$(find pointcloud_to_laserscan)/launch/point2laser.launch"/>
+    <include file="$(find autonomy)/launch/point2laser.launch"/>
     
     <node name="joy_node" pkg="joy" type="joy_node"/>
     <!--node ns="arduino" name="joy_map_node" pkg="joy_arduino" type="joy_mapping" output="screen"/>
