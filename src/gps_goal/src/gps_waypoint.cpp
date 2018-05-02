@@ -101,7 +101,7 @@ int main(int argc, char** argv)
 	// Initiate publisher to send end of node message
 	ros::Publisher pubWaypointNodeEnded = n.advertise<std_msgs::Bool>("/outdoor_waypoint_nav/waypoint_following_status", 100);
 
-	wait for the action server to come up
+	//wait for the action server to come up
 	while(!ac.waitForServer(ros::Duration(5.0)))
 	{
 		wait_count++;
@@ -173,3 +173,4 @@ int main(int argc, char** argv)
 	}
 	return 0;
 }
+

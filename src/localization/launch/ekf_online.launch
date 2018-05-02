@@ -29,7 +29,7 @@
 	<node pkg="tf2_ros" type="static_transform_publisher" name="odom_frame" args="0 0 0 0 0 0 world odom" />
 	<node pkg="tf2_ros" type="static_transform_publisher" name="imu_frame" args="0.3302 0 0.7112 			1.57 0 0 base_link imu_link" />
   <node pkg="tf2_ros" type="static_transform_publisher" name="gps_frame" args="0.8382 0 1.5494 				0 0 0 base_link /gps" />
-  <node pkg="tf2_ros" type="static_transform_publisher" name="velodyne_frame" args="1.1684 0 1.6256 	0 0 0 base_link velodyne" />
+  <node pkg="tf2_ros" type="static_transform_publisher" name="velodyne_frame" args="1.1684 0 0.6256 	0 0 0 base_link velodyne" />
 
 	<!-- EKF -->
 	<include file="$(find localization)/launch/sub_launch/ekf.launch"/>

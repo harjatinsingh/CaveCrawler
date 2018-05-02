@@ -52,28 +52,43 @@ void JoyArduino::controlCallback(const geometry_msgs::Twist::ConstPtr& msg)
 		PublishArray.data.clear();
 
 		//linear velocity mapping
-		ROS_INFO_STREAM("forward vel");
-		ROS_INFO_STREAM(msg->linear.x);
-		ROS_INFO_STREAM("angular vel");
-		ROS_INFO_STREAM(msg->angular.z);
+		// ROS_INFO_STREAM("forward vel");
+		// ROS_INFO_STREAM(msg->linear.x);
+		// ROS_INFO_STREAM("angular vel");
+		// ROS_INFO_STREAM(msg->angular.z);
 		PublishArray.data.push_back(ConvertToRange(msg->linear.x));
 
 		//steering mapping
-		PublishArray.data.push_back(ConvertToRange(-msg->angular.z));
+		int bump = 0;
+		if(-msg->angular.z > 0)
+			bump =20;
+		else if (-msg->angular.z < 0)
+			bump = -20;	
 
+
+		PublishArray.data.push_back(bump+ConvertToRange(-msg->angular.z));
 		//max robot speed
-		PublishArray.data.push_back(absoluteRange(-.5));
+		PublishArray.data.push_back(35);
 
-		if(crab_mode && msg->linear.x !=0){
-			crab_mode = false;
-			PublishArray.data.push_back(1);//switch to forward mode
-		} else if(!crab_mode && msg->linear.x==0 && msg->angular.z!= 0){
-			crab_mode = true;
-			PublishArray.data.push_back(2);//switch to crab mode
-		}else{
-			PublishArray.data.push_back(0);//continue in previous mode
-		}
+		//if(crab_mode && msg->linear.x !=0){
+		//	ROS_INFO_STREAM("SWITCHING TO  LINEAR  MODE");
+		//	crab_mode = false;
+		//	PublishArray.data.push_back(1);//switch to forward mode
+		//} else if(!crab_mode && msg->linear.x==0 && msg->angular.z!= 0){
+		//	crab_mode = true;
+		//	ROS_INFO_STREAM("SWITCHING TO CRAB  MODE");
+		//	PublishArray.data.push_back(2);//switch to crab mode
+		//}else{
+		//	if(crab_mode){
+		//		ROS_INFO_STREAM("HOLDING CRAB  MODE");
+		//	}else{
+		//		ROS_INFO_STREAM("HOLDING LINEAR  MODE");
+		//	}
 
+		//	PublishArray.data.push_back(0);//continue in previous mode
+		//}
+
+		PublishArray.data.push_back(0);//continue in previous mode
 		PublishArray.data.push_back(0);//continue in previous mode
 		PublishArray.data.push_back(0);//continue in previous mode
 
@@ -150,7 +165,7 @@ void JoyArduino::joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
 		}
 		ROS_INFO_STREAM(PublishArray);
 
-	ArduinoPub.publish(PublishArray);
+		ArduinoPub.publish(PublishArray);
 	}
 
 }

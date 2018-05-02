@@ -5,8 +5,6 @@ Panels:
     Property Tree Widget:
       Expanded:
         - /Marker1/Namespaces1
-        - /rrt_path1
-        - /teb_path1
       Splitter Ratio: 0.544444
     Tree Height: 567
   - Class: rviz/Selection
@@ -86,13 +84,13 @@ Visualization Manager:
     - Angle Tolerance: 0.1
       Class: rviz/Odometry
       Color: 255; 25; 0
-      Enabled: true
+      Enabled: false
       Keep: 10
       Length: 1
       Name: Odometry
       Position Tolerance: 0.1
       Topic: /odometry/filtered
-      Value: true
+      Value: false
     - Angle Tolerance: 0.1
       Class: rviz/Odometry
       Color: 255; 25; 0
@@ -136,7 +134,7 @@ Visualization Manager:
       Enabled: true
       Invert Rainbow: false
       Max Color: 255; 255; 255
-      Max Intensity: 136
+      Max Intensity: 227
       Min Color: 0; 0; 0
       Min Intensity: 0
       Name: velodyne
@@ -189,7 +187,7 @@ Visualization Manager:
       Radius: 0.03
       Shaft Diameter: 0.1
       Shaft Length: 0.1
-      Topic: /move_base/GlobalPlanner/plan
+      Topic: /move_base/OmplGlobalPlanner/plan
       Unreliable: false
       Value: true
     - Alpha: 1
@@ -227,6 +225,36 @@ Visualization Manager:
       Transport Hint: raw
       Unreliable: false
       Value: true
+    - Alpha: 1
+      Autocompute Intensity Bounds: true
+      Autocompute Value Bounds:
+        Max Value: 10
+        Min Value: -10
+        Value: true
+      Axis: Z
+      Channel Name: intensity
+      Class: rviz/LaserScan
+      Color: 255; 255; 255
+      Color Transformer: Intensity
+      Decay Time: 0
+      Enabled: true
+      Invert Rainbow: false
+      Max Color: 255; 255; 255
+      Max Intensity: 201
+      Min Color: 0; 0; 0
+      Min Intensity: 1
+      Name: LaserScan
+      Position Transformer: XYZ
+      Queue Size: 10
+      Selectable: true
+      Size (Pixels): 3
+      Size (m): 0.1
+      Style: Flat Squares
+      Topic: /scan
+      Unreliable: false
+      Use Fixed Frame: true
+      Use rainbow: true
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -251,7 +279,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 13.6545
+      Distance: 11.8906
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.06
         Stereo Focal Distance: 1
@@ -263,10 +291,10 @@ Visualization Manager:
         Z: 1.80817
       Name: Current View
       Near Clip Distance: 0.01
-      Pitch: 1.4548
+      Pitch: 1.0098
       Target Frame: odom
       Value: Orbit (rviz)
-      Yaw: 3.31318
+      Yaw: 3.2532
     Saved: ~
 Window Geometry:
   Displays:

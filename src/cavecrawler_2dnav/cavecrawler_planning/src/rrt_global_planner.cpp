@@ -233,7 +233,7 @@ bool OmplGlobalPlanner::makePlan(const geometry_msgs::PoseStamped& start, const 
 		// boost::shared_ptr<og::PathGeometric> path = boost::static_pointer_cast<og::PathGeometric>(planner->getProblemDefinition()->getSolutionPath()); 
 		ob::PathPtr result_path1 = pdef->getSolutionPath();
 		// ob::Cost cost = planner->getProblemDefinition()->getOptimizationObjective()->pathCost(path.get());
-		ROS_INFO_STREAM("Found global plan ");// with cost: "<<cost.value());
+		ROS_INFO_STREAM("Found global plan haha");// with cost: "<<cost.value());
 		// pub_path_marker.publish(planning_common::visualization_utils::GetMarker(*path, 0.01));
 		og::PathGeometric& result_path = static_cast<og::PathGeometric&>(*result_path1);
 
@@ -246,6 +246,7 @@ bool OmplGlobalPlanner::makePlan(const geometry_msgs::PoseStamped& start, const 
 
 		// Conversion loop from states to messages:
 		std::vector<ob::State*>& result_states = result_path.getStates();
+		ROS_INFO_STREAM("result states "<<result_states.size());
 		for (std::vector<ob::State*>::iterator it = result_states.begin(); it != result_states.end(); ++it)
 		{
 			// Get the data from the state:
@@ -258,6 +259,7 @@ bool OmplGlobalPlanner::makePlan(const geometry_msgs::PoseStamped& start, const 
 			ps.pose.position.x = x;
 			ps.pose.position.y = y;
 			plan.push_back(ps);
+			ROS_INFO_STREAM("NEW POSE "<<ps);
 		}
 
 		plan.push_back(goal);

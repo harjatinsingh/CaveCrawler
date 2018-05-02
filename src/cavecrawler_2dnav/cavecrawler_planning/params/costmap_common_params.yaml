@@ -8,11 +8,12 @@ publish_voxel_map: true
 transform_tolerance: 0.1
 meter_scoring: true
 # cost_scaling_factor: 10 # default=10
+footprint_clearing_enabled: true
 
-#footprint: [[-0.5, -0.6], [-0.5, 0.6], [0.5, 0.6], [0.5, -0.6]]
+footprint: [[-0.6, -0.7], [-0.6, 0.7], [0.6, 0.7], [0.6, -0.7]]
 #footprint: [ [-0.1,-0.125], [0.5,-0.125], [0.5,0.125], [-0.1,0.125] ]
-robot_radius: 0.6
-footprint_padding: 0.0
+# robot_radius: 0.6
+footprint_padding: 0.1
 
 plugins:
 # - {name: obstacles_layer, type: "costmap_2d::ObstacleLayer"}
@@ -22,21 +23,21 @@ plugins:
 voxel_layer:
   enabled: true
   observation_sources: scan
-  #scan: {sensor_frame: velodyne, data_type: LaserScan, topic: /emulated_scan, marking: true, clearing: true, min_obstacle_height: 0.025, max_obstacle_height: 0.4, obstacle_range: 3.0, raytrace_range: 20.0, expected_update_rate: 5, inf_is_valid: true}
-  scan: {sensor_frame: velodyne,
-         data_type: PointCloud2, 
-         topic: /velodyne_points, 
-         marking: true, 
-         clearing: true,
-         min_obstacle_height: .25, 
-         max_obstacle_height: 3, 
-         obstacle_range: 5.0, 
-         raytrace_range: 10.0, 
-         expected_update_rate: 8, 
-        observation_persistence: 0.0,
-         inf_is_valid: false}
+  scan: {sensor_frame: velodyne, data_type: LaserScan, topic: /scan, marking: true, clearing: true, min_obstacle_height: -1.0, max_obstacle_height: 5, obstacle_range: 5.0, raytrace_range: 20.0, expected_update_rate: 5, inf_is_valid: true}
+  # scan: {sensor_frame: velodyne,
+         # data_type: PointCloud2, 
+         # topic: /velodyne_points, 
+         # marking: true, 
+         # clearing: true,
+         # min_obstacle_height: .25, 
+         # max_obstacle_height: 3, 
+         # obstacle_range: 5.0, 
+         # raytrace_range: 10.0, 
+         # expected_update_rate: 8, 
+         # observation_persistence: 0.0,
+         # inf_is_valid: false}
 
 inflation_layer:
  # ADDED:
  enabled: true
- inflation_radius: 0.25
+ inflation_radius: 0.2
