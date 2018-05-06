@@ -2,6 +2,8 @@
 #include <sensor_msgs/Joy.h>
 #include <std_msgs/Int32MultiArray.h>
 #include <geometry_msgs/Twist.h>
+#include <nav_msgs/Odometry.h>
+#include <algorithm>
 
 class JoyArduino
 {
@@ -10,9 +12,12 @@ class JoyArduino
 	private:
 		void joyCallback(const sensor_msgs::Joy::ConstPtr& joy);
 		void controlCallback(const geometry_msgs::Twist::ConstPtr& msg);
+		void odomCallback(const nav_msgs::Odometry::ConstPtr& msg);
 		bool joy_control;
 		bool crab_mode;
-		ros::NodeHandle nh;
+		float steer_angle;
+		float steer_limit;
+        ros::NodeHandle nh;
 		ros::Publisher ArduinoPub;
 		ros::Subscriber JoySub;
 		ros::Subscriber cmdVelSub;
@@ -31,6 +36,7 @@ JoyArduino::JoyArduino()
 	cmdVelSub = nh.subscribe<geometry_msgs::Twist>("cmd_vel",10,&JoyArduino::controlCallback,this);
 
 	joy_control = true;
+    steer_limit = 1;
 }
 
 int ConvertToRange(float num)
@@ -58,15 +64,20 @@ void JoyArduino::controlCallback(const geometry_msgs::Twist::ConstPtr& msg)
 		// ROS_INFO_STREAM(msg->angular.z);
 		PublishArray.data.push_back(ConvertToRange(msg->linear.x));
 
+        float steer_control = 0.0;
+        int bump = 0;
 		//steering mapping
-		int bump = 0;
-		if(-msg->angular.z > 0)
+		if(-msg->angular.z > 0){
 			bump =20;
-		else if (-msg->angular.z < 0)
+            steer_control = std::max(float(-msg->linear.x), steer_limit);
+        }
+		else if (-msg->angular.z < 0){
 			bump = -20;	
+            steer_control = std::min(float(-msg->linear.x), -steer_limit);
+        }
 
 
-		PublishArray.data.push_back(bump+ConvertToRange(-msg->angular.z));
+		PublishArray.data.push_back(bump+ConvertToRange(steer_control));
 		//max robot speed
 		PublishArray.data.push_back(35);
 
@@ -97,6 +108,14 @@ void JoyArduino::controlCallback(const geometry_msgs::Twist::ConstPtr& msg)
 	}
 
 }
+
+void JoyArduino::odomCallback(const nav_msgs::Odometry::ConstPtr& odom)
+{
+    ROS_INFO_STREAM(odom);
+    ROS_INFO_STREAM(odom->twist.twist);
+
+}
+
 
 void JoyArduino::joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
 {
